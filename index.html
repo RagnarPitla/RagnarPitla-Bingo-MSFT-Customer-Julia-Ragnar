@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2025 Goals Bingo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .player-section {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        .player-input {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .player-input label {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .player-input input {
+            padding: 12px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            width: 250px;
+            transition: border-color 0.3s;
+        }
+
+        .player-input input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+        }
+
+        .player-name-display {
+            text-align: center;
+            font-size: 1.2rem;
+            color: #333;
+            margin-top: 10px;
+        }
+
+        .player-name-display span {
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .bingo-board {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        .bingo-cell {
+            aspect-ratio: 1;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+            transition: all 0.3s;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .bingo-cell:hover {
+            transform: scale(1.02);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .cell-header {
+            padding: 8px 10px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: white;
+            line-height: 1.2;
+        }
+
+        .cell-content {
+            flex: 1;
+            background: white;
+            margin: 0 4px 4px 4px;
+            border-radius: 0 0 6px 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 5px;
+        }
+
+        .bingo-cell.marked .cell-content {
+            background: rgba(0,0,0,0.1);
+        }
+
+        .bingo-cell.marked::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3rem;
+            color: rgba(0,0,0,0.3);
+            font-weight: bold;
+        }
+
+        /* Color classes */
+        .color-yellow { background-color: #ffd54f; }
+        .color-red { background-color: #ef5350; }
+        .color-red .cell-header { color: white; }
+        .color-blue { background-color: #64b5f6; }
+        .color-green { background-color: #81c784; }
+        .color-purple { background-color: #ba68c8; }
+        .color-orange { background-color: #ffb74d; }
+        .color-pink { background-color: #f48fb1; }
+        .color-teal { background-color: #4db6ac; }
+
+        .free-square {
+            background: #64b5f6 !important;
+        }
+
+        .free-square .cell-header {
+            background: #64b5f6;
+        }
+
+        .free-square .cell-content {
+            background: #90caf9;
+            font-weight: 600;
+            color: #1565c0;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .bingo-alert {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 60px;
+            border-radius: 20px;
+            font-size: 3rem;
+            font-weight: bold;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            z-index: 1000;
+            animation: pulse 0.5s ease-in-out infinite alternate;
+            display: none;
+        }
+
+        @keyframes pulse {
+            from { transform: translate(-50%, -50%) scale(1); }
+            to { transform: translate(-50%, -50%) scale(1.1); }
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+            display: none;
+        }
+
+        .progress-section {
+            background: white;
+            border-radius: 15px;
+            padding: 15px 20px;
+            margin-top: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        .progress-bar {
+            height: 20px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        .progress-text {
+            text-align: center;
+            font-weight: 600;
+            color: #333;
+        }
+
+        @media (max-width: 600px) {
+            .bingo-board {
+                gap: 4px;
+                padding: 10px;
+            }
+
+            .cell-header {
+                font-size: 0.6rem;
+                padding: 5px;
+            }
+
+            .bingo-cell.marked::after {
+                font-size: 2rem;
+            }
+
+            .header h1 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 2025 Goals Bingo</h1>
+            <p>Click squares as you complete each goal!</p>
+        </div>
+
+        <div class="player-section">
+            <div class="player-input">
+                <label for="playerName">Your Name:</label>
+                <input type="text" id="playerName" placeholder="Enter your name">
+                <button class="btn btn-primary" onclick="setPlayerName()">Start Playing</button>
+            </div>
+            <div class="player-name-display" id="playerDisplay" style="display: none;">
+                Playing as: <span id="currentPlayer"></span>
+            </div>
+        </div>
+
+        <div class="bingo-board" id="bingoBoard"></div>
+
+        <div class="progress-section">
+            <div class="progress-text">
+                Progress: <span id="progressCount">0</span>/25 goals completed
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-secondary" onclick="resetBoard()">Reset Board</button>
+            <button class="btn btn-success" onclick="shareProgress()">Share Progress</button>
+        </div>
+    </div>
+
+    <div class="overlay" id="overlay" onclick="closeBingo()"></div>
+    <div class="bingo-alert" id="bingoAlert">🎉 BINGO! 🎉</div>
+
+    <script>
+        const bingoItems = [
+            { text: "Use Copilot Studio to extend Dynamics", color: "yellow", category: "work" },
+            { text: "Drink less alcohol", color: "red", category: "health" },
+            { text: "Use Copilot to plan a holiday", color: "blue", category: "work" },
+            { text: "Learn a new AI skill", color: "green", category: "learning" },
+            { text: "Test Supplier Comm Agent", color: "purple", category: "work" },
+            { text: "Drink more water", color: "yellow", category: "health" },
+            { text: "Use Customer Payment Predictions", color: "green", category: "work" },
+            { text: "Save more money", color: "blue", category: "personal" },
+            { text: "Use the Financial Recon agent", color: "green", category: "work" },
+            { text: "Learn a new language", color: "green", category: "learning" },
+            { text: "Read more books", color: "pink", category: "personal" },
+            { text: "Use Intelligent Budget Proposals", color: "orange", category: "work" },
+            { text: "FREE SQUARE", color: "blue", category: "free", isFree: true },
+            { text: "Use Copilot to draft emails", color: "green", category: "work" },
+            { text: "Lose weight", color: "teal", category: "health" },
+            { text: "Roll out Supplier Comm Agent", color: "yellow", category: "work" },
+            { text: "Create ERP Agent", color: "orange", category: "work" },
+            { text: "Roll out Account Recon Agent", color: "blue", category: "work" },
+            { text: "Use the Demand Planning Insights", color: "green", category: "work" },
+            { text: "Try a new exercise or fitness goal", color: "teal", category: "health" },
+            { text: "Test Account Recon agent", color: "yellow", category: "work" },
+            { text: "Travel more", color: "orange", category: "personal" },
+            { text: "Quit a bad habit", color: "pink", category: "health" },
+            { text: "Spend more time with family", color: "purple", category: "personal" },
+            { text: "Use Cash Flow Forecasting", color: "teal", category: "work" }
+        ];
+
+        let playerName = '';
+        let markedCells = new Set();
+
+        function init() {
+            loadState();
+            renderBoard();
+            updateProgress();
+        }
+
+        function setPlayerName() {
+            const input = document.getElementById('playerName');
+            playerName = input.value.trim();
+            if (playerName) {
+                document.getElementById('currentPlayer').textContent = playerName;
+                document.getElementById('playerDisplay').style.display = 'block';
+                saveState();
+            }
+        }
+
+        function renderBoard() {
+            const board = document.getElementById('bingoBoard');
+            board.innerHTML = '';
+
+            bingoItems.forEach((item, index) => {
+                const cell = document.createElement('div');
+                cell.className = `bingo-cell color-${item.color}${markedCells.has(index) ? ' marked' : ''}${item.isFree ? ' free-square' : ''}`;
+                cell.onclick = () => toggleCell(index);
+
+                if (item.isFree) {
+                    cell.innerHTML = `
+                        <div class="cell-header">FREE SQUARE</div>
+                        <div class="cell-content">${playerName || 'Your Name'}<br>FREE SQUARE</div>
+                    `;
+                } else {
+                    cell.innerHTML = `
+                        <div class="cell-header">${item.text}</div>
+                        <div class="cell-content"></div>
+                    `;
+                }
+
+                board.appendChild(cell);
+            });
+        }
+
+        function toggleCell(index) {
+            if (bingoItems[index].isFree) {
+                // Free square is always marked
+                markedCells.add(index);
+            } else if (markedCells.has(index)) {
+                markedCells.delete(index);
+            } else {
+                markedCells.add(index);
+            }
+
+            renderBoard();
+            updateProgress();
+            checkBingo();
+            saveState();
+        }
+
+        function updateProgress() {
+            const count = markedCells.size;
+            document.getElementById('progressCount').textContent = count;
+            document.getElementById('progressFill').style.width = `${(count / 25) * 100}%`;
+        }
+
+        function checkBingo() {
+            const lines = [
+                // Rows
+                [0, 1, 2, 3, 4],
+                [5, 6, 7, 8, 9],
+                [10, 11, 12, 13, 14],
+                [15, 16, 17, 18, 19],
+                [20, 21, 22, 23, 24],
+                // Columns
+                [0, 5, 10, 15, 20],
+                [1, 6, 11, 16, 21],
+                [2, 7, 12, 17, 22],
+                [3, 8, 13, 18, 23],
+                [4, 9, 14, 19, 24],
+                // Diagonals
+                [0, 6, 12, 18, 24],
+                [4, 8, 12, 16, 20]
+            ];
+
+            for (const line of lines) {
+                if (line.every(index => markedCells.has(index))) {
+                    showBingo();
+                    return;
+                }
+            }
+        }
+
+        function showBingo() {
+            document.getElementById('overlay').style.display = 'block';
+            document.getElementById('bingoAlert').style.display = 'block';
+        }
+
+        function closeBingo() {
+            document.getElementById('overlay').style.display = 'none';
+            document.getElementById('bingoAlert').style.display = 'none';
+        }
+
+        function resetBoard() {
+            if (confirm('Are you sure you want to reset your progress?')) {
+                markedCells = new Set();
+                // Auto-mark free square
+                markedCells.add(12);
+                renderBoard();
+                updateProgress();
+                saveState();
+            }
+        }
+
+        function shareProgress() {
+            const count = markedCells.size;
+            const text = `🎯 ${playerName || 'I'} completed ${count}/25 goals on the 2025 Goals Bingo! ${count === 25 ? '🏆 BLACKOUT!' : ''}`;
+
+            if (navigator.share) {
+                navigator.share({
+                    title: '2025 Goals Bingo',
+                    text: text
+                });
+            } else {
+                navigator.clipboard.writeText(text).then(() => {
+                    alert('Progress copied to clipboard!');
+                });
+            }
+        }
+
+        function saveState() {
+            const state = {
+                playerName,
+                markedCells: Array.from(markedCells)
+            };
+            localStorage.setItem('bingoState', JSON.stringify(state));
+        }
+
+        function loadState() {
+            const saved = localStorage.getItem('bingoState');
+            if (saved) {
+                const state = JSON.parse(saved);
+                playerName = state.playerName || '';
+                markedCells = new Set(state.markedCells || []);
+
+                if (playerName) {
+                    document.getElementById('playerName').value = playerName;
+                    document.getElementById('currentPlayer').textContent = playerName;
+                    document.getElementById('playerDisplay').style.display = 'block';
+                }
+            } else {
+                // Auto-mark free square for new users
+                markedCells.add(12);
+            }
+        }
+
+        // Initialize on load
+        init();
+    </script>
+</body>
+</html>
