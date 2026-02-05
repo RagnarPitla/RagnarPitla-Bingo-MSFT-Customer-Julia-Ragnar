@@ -28,9 +28,37 @@
         }
 
         .container {
-            max-width: 900px;
+            max-width: 1400px;
             margin: 0 auto;
             position: relative;
+        }
+
+        .game-layout {
+            display: flex;
+            gap: 25px;
+            align-items: flex-start;
+        }
+
+        .game-left {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .game-right {
+            width: 280px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        @media (max-width: 900px) {
+            .game-layout {
+                flex-direction: column;
+            }
+            .game-right {
+                width: 100%;
+            }
         }
 
         .header {
@@ -496,6 +524,85 @@
             50% { opacity: 1; transform: scale(1); }
         }
 
+        /* Share modal */
+        .share-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background: white;
+            padding: 30px 40px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.3);
+            z-index: 1000;
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            max-width: 450px;
+            width: 90%;
+        }
+
+        .share-modal.show {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+        }
+
+        .share-modal h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .share-modal .success-icon {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+
+        .share-modal .instructions {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
+            border-radius: 12px;
+            padding: 15px;
+            margin: 15px 0;
+            text-align: left;
+        }
+
+        .share-modal .instructions h4 {
+            font-size: 0.9rem;
+            color: #667eea;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .share-modal .instructions ol {
+            margin: 0;
+            padding-left: 20px;
+            color: #555;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .share-modal .share-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .share-modal .btn-icon {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .share-modal .divider {
+            color: #999;
+            font-size: 0.85rem;
+            margin: 15px 0 10px;
+        }
+
         @media (max-width: 600px) {
             .bingo-board {
                 gap: 6px;
@@ -539,35 +646,82 @@
             <p>Click squares as you complete each goal!</p>
         </div>
 
-        <div class="player-section">
-            <div class="player-input">
-                <label for="playerName">Your Name:</label>
-                <input type="text" id="playerName" placeholder="Enter your name">
-                <button class="btn btn-primary" onclick="setPlayerName()">Start Playing</button>
-            </div>
-            <div class="player-name-display" id="playerDisplay" style="display: none;">
-                Playing as: <span id="currentPlayer"></span>
-            </div>
-        </div>
-
-        <div class="bingo-board" id="bingoBoard"></div>
-
-        <div class="progress-section">
-            <div class="progress-text">
-                Progress: <span id="progressCount">0</span>/25 goals completed
-            </div>
-            <div class="progress-bar">
-                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+        <div class="player-section" id="setupSection">
+            <h2 style="text-align: center; margin-bottom: 20px; color: #333;">Welcome! Enter your details to start playing</h2>
+            <div class="player-input" style="flex-direction: column; gap: 15px;">
+                <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; justify-content: center;">
+                    <label for="playerName">Your Name:</label>
+                    <input type="text" id="playerName" placeholder="Enter your name">
+                </div>
+                <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; justify-content: center;">
+                    <label for="companyName">Company:</label>
+                    <input type="text" id="companyName" placeholder="Enter your company" style="width: 260px;">
+                </div>
+                <button class="btn btn-primary" onclick="startPlaying()" style="margin-top: 10px; padding: 16px 40px; font-size: 1.1rem;">Start Playing</button>
             </div>
         </div>
 
-        <div class="controls">
-            <button class="btn btn-secondary" onclick="resetBoard()">Reset Board</button>
-            <button class="btn btn-success" onclick="shareProgress()">Share Progress</button>
+        <div class="game-layout" id="gameLayout" style="display: none;">
+            <div class="game-left">
+                <div class="bingo-board" id="bingoBoard"></div>
+            </div>
+            <div class="game-right">
+                <div class="player-section" id="playerDisplay">
+                    <div class="player-name-display" style="margin: 0;">
+                        <strong id="currentPlayer"></strong>
+                        <div style="font-size: 0.9rem; opacity: 0.8; margin-top: 5px;" id="currentCompany"></div>
+                    </div>
+                </div>
+
+                <div class="progress-section" id="progressSection" style="margin-top: 0;">
+                    <div class="progress-text">
+                        <span id="progressCount">0</span>/25 goals
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <div class="player-section" id="bingoStats" style="text-align: center;">
+                    <div style="font-size: 2.5rem; font-weight: bold; background: linear-gradient(135deg, #667eea, #764ba2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+                        <span id="bingoCountDisplay">0</span>
+                    </div>
+                    <div style="font-size: 0.9rem; color: #666;">Bingos Completed</div>
+                </div>
+
+                <div class="controls" id="controlsSection" style="flex-direction: column; margin-top: 0;">
+                    <button class="btn btn-success" onclick="shareProgress()" style="width: 100%;">Share Progress</button>
+                    <button class="btn btn-secondary" onclick="resetBoard()" style="width: 100%;">Reset Board</button>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="overlay" id="overlay" onclick="closeBingo()"></div>
+    <div class="overlay" id="overlay" onclick="closeModals()"></div>
+
+    <div class="share-modal" id="shareModal">
+        <div class="success-icon" id="shareIcon">✅</div>
+        <h3 id="shareTitle">Image Copied to Clipboard!</h3>
+        <div class="instructions">
+            <h4>📋 Paste in Microsoft Teams:</h4>
+            <ol>
+                <li>Open your Teams chat or channel</li>
+                <li>Click in the message box</li>
+                <li>Press <strong>Ctrl+V</strong> (or <strong>Cmd+V</strong> on Mac)</li>
+                <li>Send your message!</li>
+            </ol>
+        </div>
+        <div class="share-buttons">
+            <button class="btn btn-success btn-icon" id="copyBtn" onclick="copyToClipboard()">
+                <span>📋</span> Copy to Clipboard
+            </button>
+            <button class="btn btn-primary btn-icon" onclick="saveImage()">
+                <span>💾</span> Save Image
+            </button>
+            <button class="btn btn-secondary" onclick="closeShareModal()">Done</button>
+        </div>
+    </div>
+
     <div class="bingo-alert" id="bingoAlert">
         <h2>BINGO!</h2>
         <p>Congratulations! You completed a line!</p>
@@ -608,24 +762,41 @@
         ];
 
         let playerName = '';
+        let companyName = '';
         let markedCells = new Set();
         let completedBingos = new Set();
 
         function init() {
             loadState();
-            renderBoard();
-            updateProgress();
+            if (playerName && companyName) {
+                showGame();
+            }
         }
 
-        function setPlayerName() {
-            const input = document.getElementById('playerName');
-            playerName = input.value.trim();
-            if (playerName) {
-                document.getElementById('currentPlayer').textContent = playerName;
-                document.getElementById('playerDisplay').style.display = 'block';
-                renderBoard();
-                saveState();
+        function startPlaying() {
+            const nameInput = document.getElementById('playerName');
+            const companyInput = document.getElementById('companyName');
+            playerName = nameInput.value.trim();
+            companyName = companyInput.value.trim();
+
+            if (!playerName || !companyName) {
+                alert('Please enter both your name and company to start playing!');
+                return;
             }
+
+            saveState();
+            showGame();
+        }
+
+        function showGame() {
+            document.getElementById('setupSection').style.display = 'none';
+            document.getElementById('gameLayout').style.display = 'flex';
+
+            document.getElementById('currentPlayer').textContent = playerName;
+            document.getElementById('currentCompany').textContent = companyName;
+            document.getElementById('bingoCountDisplay').textContent = completedBingos.size;
+            renderBoard();
+            updateProgress();
         }
 
         function renderBoard() {
@@ -640,7 +811,7 @@
                 if (item.isFree) {
                     cell.innerHTML = `
                         <div class="cell-header">FREE SQUARE</div>
-                        <div class="cell-content">${playerName || 'Your Name'}</div>
+                        <div class="cell-content">${playerName || 'Your Name'}<br><small>${companyName || ''}</small></div>
                     `;
                 } else {
                     cell.innerHTML = `
@@ -752,6 +923,7 @@
 
         function showBingo() {
             document.getElementById('bingoCount').textContent = completedBingos.size;
+            document.getElementById('bingoCountDisplay').textContent = completedBingos.size;
             document.getElementById('overlay').classList.add('show');
             document.getElementById('bingoAlert').classList.add('show');
             launchConfetti();
@@ -792,10 +964,11 @@
         }
 
         function resetBoard() {
-            if (confirm('Are you sure you want to reset your progress?')) {
+            if (confirm('Are you sure you want to reset your progress? This will clear all your completed goals.')) {
                 markedCells = new Set();
                 completedBingos = new Set();
                 markedCells.add(12);
+                document.getElementById('bingoCountDisplay').textContent = '0';
                 renderBoard();
                 updateProgress();
                 saveState();
@@ -828,7 +1001,10 @@
             ctx.textAlign = 'center';
             ctx.fillText('Dynamics Champions Bingo', canvas.width / 2, 45);
 
-            if (playerName) {
+            if (playerName && companyName) {
+                ctx.font = '16px Segoe UI, sans-serif';
+                ctx.fillText(`${playerName} | ${companyName}`, canvas.width / 2, 70);
+            } else if (playerName) {
                 ctx.font = '16px Segoe UI, sans-serif';
                 ctx.fillText(`Player: ${playerName}`, canvas.width / 2, 70);
             }
@@ -901,18 +1077,97 @@
             ctx.fillText(progressText, canvas.width / 2, canvas.height - 25);
 
             canvas.toBlob(blob => {
-                const url = URL.createObjectURL(blob);
+                // Store blob for later use
+                window.currentShareBlob = blob;
+                // Show modal with options
+                showShareModal(false);
+            }, 'image/png');
+        }
+
+        async function copyToClipboard() {
+            if (!window.currentShareBlob) return;
+
+            try {
+                await navigator.clipboard.write([
+                    new ClipboardItem({ 'image/png': window.currentShareBlob })
+                ]);
+                // Update UI to show success
+                document.getElementById('shareIcon').textContent = '✅';
+                document.getElementById('shareTitle').textContent = 'Image Copied to Clipboard!';
+                document.getElementById('copyBtn').innerHTML = '<span>✓</span> Copied!';
+                document.getElementById('copyBtn').disabled = true;
+            } catch (err) {
+                // Try alternative method using canvas
+                try {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    const img = new Image();
+                    img.onload = async () => {
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        ctx.drawImage(img, 0, 0);
+                        canvas.toBlob(async (newBlob) => {
+                            try {
+                                await navigator.clipboard.write([
+                                    new ClipboardItem({ 'image/png': newBlob })
+                                ]);
+                                document.getElementById('shareIcon').textContent = '✅';
+                                document.getElementById('shareTitle').textContent = 'Image Copied to Clipboard!';
+                                document.getElementById('copyBtn').innerHTML = '<span>✓</span> Copied!';
+                                document.getElementById('copyBtn').disabled = true;
+                            } catch (e) {
+                                alert('Could not copy to clipboard. Please use "Save Image" and attach manually.');
+                            }
+                        }, 'image/png');
+                    };
+                    img.src = URL.createObjectURL(window.currentShareBlob);
+                } catch (e) {
+                    alert('Could not copy to clipboard. Please use "Save Image" and attach manually.');
+                }
+            }
+        }
+
+        function showShareModal(copied = false) {
+            if (copied) {
+                document.getElementById('shareIcon').textContent = '✅';
+                document.getElementById('shareTitle').textContent = 'Image Copied to Clipboard!';
+                document.getElementById('copyBtn').innerHTML = '<span>✓</span> Copied!';
+                document.getElementById('copyBtn').disabled = true;
+            } else {
+                document.getElementById('shareIcon').textContent = '🎯';
+                document.getElementById('shareTitle').textContent = 'Share Your Progress!';
+                document.getElementById('copyBtn').innerHTML = '<span>📋</span> Copy to Clipboard';
+                document.getElementById('copyBtn').disabled = false;
+            }
+            document.getElementById('overlay').classList.add('show');
+            document.getElementById('shareModal').classList.add('show');
+        }
+
+        function closeShareModal() {
+            document.getElementById('overlay').classList.remove('show');
+            document.getElementById('shareModal').classList.remove('show');
+        }
+
+        function closeModals() {
+            closeBingo();
+            closeShareModal();
+        }
+
+        function saveImage() {
+            if (window.currentShareBlob) {
+                const url = URL.createObjectURL(window.currentShareBlob);
                 const a = document.createElement('a');
                 a.href = url;
                 a.download = `bingo-progress-${playerName || 'board'}.png`;
                 a.click();
                 URL.revokeObjectURL(url);
-            }, 'image/png');
+            }
         }
 
         function saveState() {
             const state = {
                 playerName,
+                companyName,
                 markedCells: Array.from(markedCells),
                 completedBingos: Array.from(completedBingos)
             };
@@ -924,13 +1179,15 @@
             if (saved) {
                 const state = JSON.parse(saved);
                 playerName = state.playerName || '';
+                companyName = state.companyName || '';
                 markedCells = new Set(state.markedCells || []);
                 completedBingos = new Set(state.completedBingos || []);
 
                 if (playerName) {
                     document.getElementById('playerName').value = playerName;
-                    document.getElementById('currentPlayer').textContent = playerName;
-                    document.getElementById('playerDisplay').style.display = 'block';
+                }
+                if (companyName) {
+                    document.getElementById('companyName').value = companyName;
                 }
             } else {
                 markedCells.add(12);
