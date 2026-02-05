@@ -70,13 +70,27 @@ Then open http://localhost:3000 in your browser.
 
 ### Step 5: Publish
 
+Copy and paste this in your terminal (replace the message with your own):
+
 ```bash
-git add .
-git commit -m "Your change description"
-git push
+git add . && git commit -m "Updated bingo content" && git push
 ```
 
-**That's it!** GitHub Actions will automatically deploy to Azure. No secrets or configuration needed - it's already set up.
+Or use this one-liner prompt:
+
+```bash
+git add . && git commit -m "My changes: [describe what you changed]" && git push
+```
+
+**That's it!** GitHub Actions will automatically deploy to Azure in 1-2 minutes. No secrets or configuration needed - it's already set up.
+
+### Quick Copy-Paste Commands
+
+| What you want to do | Command |
+|---------------------|---------|
+| Publish all changes | `git add . && git commit -m "Updated content" && git push` |
+| Check what changed | `git status` |
+| Undo uncommitted changes | `git checkout .` |
 
 ---
 
