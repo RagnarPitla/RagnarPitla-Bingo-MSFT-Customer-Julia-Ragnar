@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Champions Bingo | Dynamics 365</title>
+    <title>Dynamics Champions BINGO</title>
     <style>
         * {
             margin: 0;
@@ -310,13 +310,14 @@
         .color-teal .cell-header { color: white; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
 
         .free-square {
-            background: linear-gradient(135deg, #FFB900 0%, #E6A700 100%) !important;
+            background: linear-gradient(to right, #FF6600 0%, #FF9900 100%) !important;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3), 0 0 20px rgba(255, 102, 0, 0.5);
             animation: freeSquareGlow 2s ease-in-out infinite;
         }
 
         @keyframes freeSquareGlow {
-            0%, 100% { box-shadow: 0 0 20px rgba(255, 185, 0, 0.5); }
-            50% { box-shadow: 0 0 40px rgba(255, 185, 0, 0.8); }
+            0%, 100% { box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3), 0 0 20px rgba(255, 102, 0, 0.5); }
+            50% { box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3), 0 0 40px rgba(255, 153, 0, 0.8); }
         }
 
         .free-square .cell-header {
@@ -651,10 +652,7 @@
 
     <div class="container">
         <div class="header">
-            <h1 style="display: flex; align-items: center; justify-content: center; gap: 15px;">
-                <img src="https://img-prod-cms-rt-microsoft-com.akamaized.net/cms/api/am/imageFileData/RE4Fmqb" alt="Dynamics 365" style="height: 50px; filter: brightness(0) invert(1);">
-                <span>Champions Bingo</span>
-            </h1>
+            <h1>Dynamics Champions BINGO</h1>
             <p>Click squares as you complete each goal!</p>
         </div>
 
@@ -760,7 +758,7 @@
             { text: "Learn a new language", color: "green", category: "learning" },
             { text: "Read more books", color: "blue", category: "personal" },
             { text: "Use Intelligent Budget Proposals", color: "yellow", category: "work" },
-            { text: "CHAMPIONS", color: "yellow", category: "free", isFree: true },
+            { text: "FREE SPACE", color: "yellow", category: "free", isFree: true },
             { text: "Use Copilot to draft emails", color: "red", category: "work" },
             { text: "Lose weight", color: "green", category: "health" },
             { text: "Roll out Supplier Comm Agent", color: "blue", category: "work" },
@@ -870,7 +868,7 @@
                 if (item.isFree) {
                     const displayName = playerName && companyName ? `${playerName}-${companyName}` : (playerName || 'Your Name');
                     cell.innerHTML = `
-                        <div class="cell-header">CHAMPIONS</div>
+                        <div class="cell-header">FREE SPACE</div>
                         <div class="cell-content">${displayName}</div>
                     `;
                 } else {
@@ -1094,7 +1092,7 @@
             ctx.fillStyle = 'white';
             ctx.font = 'bold 28px Segoe UI, sans-serif';
             ctx.textAlign = 'center';
-            ctx.fillText('Dynamics 365 Champions Bingo', canvas.width / 2, 45);
+            ctx.fillText('Dynamics Champions BINGO', canvas.width / 2, 45);
 
             if (playerName && companyName) {
                 ctx.font = '16px Segoe UI, sans-serif';
