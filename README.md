@@ -1,82 +1,78 @@
-# 2025 Goals Bingo
+# Dynamics Champions Bingo
 
-An interactive bingo game for tracking personal and work goals throughout the year.
+An interactive bingo game for tracking goals throughout the year.
+
+**Live App**: https://black-coast-0f5b5a60f.4.azurestaticapps.net
 
 ## Features
 
-- 🎯 Interactive 5x5 bingo board with goals
-- 👤 Personalized player names
-- 💾 Progress auto-saves to browser localStorage
-- 🎉 Bingo detection for rows, columns, and diagonals
-- 📊 Progress tracking bar
-- 📱 Mobile-responsive design
-- 🔗 Share your progress with friends
+- Interactive 5x5 bingo board with goals
+- Player name and company input
+- Progress auto-saves to browser localStorage
+- Multiple bingo detection for rows, columns, and diagonals
+- PNG export for sharing progress on Microsoft Teams
+- Beautiful animations and confetti celebrations
+- Mobile-responsive design
 
-## Deployment to Azure Static Web Apps
+## Getting Started (For Collaborators)
 
 ### Prerequisites
 
-1. An Azure account
-2. A GitHub account
-3. Azure CLI (optional, for command-line deployment)
+- [Node.js](https://nodejs.org/) (v18 or later)
+- [VS Code](https://code.visualstudio.com/) (recommended)
+- [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli) (for deployment)
 
-### Setup Steps
+### Setup
 
-1. **Create a GitHub Repository**
+1. **Clone the repository**
    ```bash
+   git clone https://github.com/RagnarPitla/bingo-app.git
    cd bingo-app
-   git init
-   git add .
-   git commit -m "Initial commit - Bingo app"
-   git branch -M main
-   git remote add origin https://github.com/YOUR_USERNAME/bingo-app.git
-   git push -u origin main
    ```
 
-2. **Create Azure Static Web App**
-   - Go to [Azure Portal](https://portal.azure.com)
-   - Click "Create a resource" → Search "Static Web App"
-   - Fill in the details:
-     - **Subscription**: Your subscription
-     - **Resource Group**: Create new or use existing
-     - **Name**: bingo-app (or your preferred name)
-     - **Region**: Choose closest to your users
-     - **SKU**: Free
-   - Under "Deployment details":
-     - **Source**: GitHub
-     - **Organization**: Your GitHub username
-     - **Repository**: bingo-app
-     - **Branch**: main
-   - Under "Build Details":
-     - **Build Presets**: Custom
-     - **App location**: /
-     - **Api location**: (leave empty)
-     - **Output location**: (leave empty)
-   - Click "Review + create" → "Create"
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-3. **GitHub Actions Workflow**
-   - Azure will automatically create a GitHub Actions workflow
-   - A deployment token will be added as a secret `AZURE_STATIC_WEB_APPS_API_TOKEN`
-   - The included `.github/workflows/azure-static-web-apps.yml` will handle deployments
+3. **Install recommended VS Code extensions**
+   - Open the project in VS Code
+   - You'll be prompted to install recommended extensions
+   - Or run: `Ctrl+Shift+P` → "Extensions: Show Recommended Extensions"
 
-4. **Access Your App**
-   - After deployment, find your URL in Azure Portal under your Static Web App resource
-   - URL format: `https://<random-name>.azurestaticapps.net`
+4. **Run locally**
+   ```bash
+   npm start
+   ```
+   Then open http://localhost:3000
 
-### Updating the App
+### Making Changes
 
-Simply push changes to the `main` branch:
+1. Edit files (mainly `index.html`)
+2. Test locally with `npm start`
+3. Commit and push to GitHub:
+   ```bash
+   git add .
+   git commit -m "Your change description"
+   git push
+   ```
+4. GitHub Actions will automatically deploy to Azure
+
+### Manual Deployment (CLI)
+
+If you need to deploy directly:
+
 ```bash
-git add .
-git commit -m "Your update message"
-git push
+# Login to Azure
+az login
+
+# Build and deploy
+npm run deploy
 ```
 
-The GitHub Actions workflow will automatically deploy your changes.
+## Customizing Bingo Items
 
-## Customizing the Bingo Items
-
-Edit the `bingoItems` array in `index.html` to customize the goals:
+Edit the `bingoItems` array in `index.html`:
 
 ```javascript
 const bingoItems = [
@@ -87,20 +83,21 @@ const bingoItems = [
 
 Available colors: `yellow`, `red`, `blue`, `green`, `purple`, `orange`, `pink`, `teal`
 
-## Local Development
+## Project Structure
 
-Simply open `index.html` in a web browser - no build step required!
-
-```bash
-# Using Python
-python -m http.server 8000
-
-# Using Node.js
-npx serve .
-
-# Then open http://localhost:8000
+```
+bingo-app/
+├── index.html              # Main app (HTML, CSS, JS all-in-one)
+├── staticwebapp.config.json # Azure SWA configuration
+├── swa-cli.config.json     # SWA CLI configuration
+├── package.json            # Node.js dependencies
+├── .vscode/
+│   └── extensions.json     # Recommended VS Code extensions
+└── .github/
+    └── workflows/
+        └── azure-static-web-apps.yml  # Auto-deployment workflow
 ```
 
 ## License
 
-MIT License - Feel free to use and modify!
+MIT License

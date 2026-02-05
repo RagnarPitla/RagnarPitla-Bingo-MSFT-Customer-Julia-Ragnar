@@ -1,0 +1,7 @@
+{
+  "recommendations": [
+    "ms-azuretools.vscode-azurestaticwebapps",
+    "ritwickdey.LiveServer",
+    "dbaeumer.vscode-eslint"
+  ]
+}

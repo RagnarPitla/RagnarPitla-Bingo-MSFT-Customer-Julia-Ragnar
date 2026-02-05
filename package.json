@@ -1,0 +1,17 @@
+{
+  "name": "dynamics-champions-bingo",
+  "version": "1.0.0",
+  "description": "Dynamics Champions Bingo - A fun interactive bingo game for tracking goals",
+  "scripts": {
+    "start": "npx serve .",
+    "deploy": "npm run build && swa deploy ./dist --env production",
+    "build": "mkdir -p dist && cp index.html staticwebapp.config.json dist/"
+  },
+  "devDependencies": {
+    "@azure/static-web-apps-cli": "^2.0.8",
+    "serve": "^14.2.0"
+  },
+  "keywords": ["bingo", "dynamics", "goals"],
+  "author": "Ragnar Pitla",
+  "license": "MIT"
+}

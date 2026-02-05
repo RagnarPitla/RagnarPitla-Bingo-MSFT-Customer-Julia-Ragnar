@@ -3,8 +3,16 @@
 Thumbs.db
 
 # IDE
-.vscode/
 .idea/
+
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Environment files
+.env
 
 # Logs
 *.log
