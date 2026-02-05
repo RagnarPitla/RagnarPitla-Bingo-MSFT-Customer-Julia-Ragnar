@@ -2,7 +2,7 @@
 
 An interactive bingo game for tracking goals throughout the year.
 
-**Live App**: https://black-coast-0f5b5a60f.4.azurestaticapps.net
+**Live App**: https://lemon-ground-0fecfc40f.1.azurestaticapps.net
 
 ## Features
 
