@@ -289,36 +289,44 @@
             100% { transform: translate(-50%, -50%) scale(1) rotate(0deg); }
         }
 
-        /* Enhanced color classes with gradients */
-        .color-yellow { background: linear-gradient(135deg, #ffd54f 0%, #ffb300 100%); }
-        .color-red { background: linear-gradient(135deg, #ef5350 0%, #d32f2f 100%); }
+        /* Microsoft brand colors */
+        .color-yellow { background: linear-gradient(135deg, #FFB900 0%, #E6A700 100%); }
+        .color-yellow .cell-header { color: #333; }
+        .color-red { background: linear-gradient(135deg, #F25022 0%, #D94419 100%); }
         .color-red .cell-header { color: white; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
-        .color-blue { background: linear-gradient(135deg, #64b5f6 0%, #1976d2 100%); }
-        .color-green { background: linear-gradient(135deg, #81c784 0%, #388e3c 100%); }
-        .color-purple { background: linear-gradient(135deg, #ba68c8 0%, #7b1fa2 100%); }
-        .color-orange { background: linear-gradient(135deg, #ffb74d 0%, #f57c00 100%); }
-        .color-pink { background: linear-gradient(135deg, #f48fb1 0%, #c2185b 100%); }
-        .color-teal { background: linear-gradient(135deg, #4db6ac 0%, #00796b 100%); }
+        .color-blue { background: linear-gradient(135deg, #00A4EF 0%, #0078D4 100%); }
+        .color-blue .cell-header { color: white; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
+        .color-green { background: linear-gradient(135deg, #7FBA00 0%, #6CA200 100%); }
+        .color-green .cell-header { color: white; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
+        /* Map other colors to MS colors */
+        .color-purple { background: linear-gradient(135deg, #5C2D91 0%, #4B2479 100%); }
+        .color-purple .cell-header { color: white; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
+        .color-orange { background: linear-gradient(135deg, #FFB900 0%, #E6A700 100%); }
+        .color-orange .cell-header { color: #333; }
+        .color-pink { background: linear-gradient(135deg, #F25022 0%, #D94419 100%); }
+        .color-pink .cell-header { color: white; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
+        .color-teal { background: linear-gradient(135deg, #00A4EF 0%, #0078D4 100%); }
+        .color-teal .cell-header { color: white; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
 
         .free-square {
-            background: linear-gradient(135deg, #ffd700 0%, #ff8c00 100%) !important;
+            background: linear-gradient(135deg, #FFB900 0%, #E6A700 100%) !important;
             animation: freeSquareGlow 2s ease-in-out infinite;
         }
 
         @keyframes freeSquareGlow {
-            0%, 100% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.5); }
-            50% { box-shadow: 0 0 40px rgba(255, 215, 0, 0.8); }
+            0%, 100% { box-shadow: 0 0 20px rgba(255, 185, 0, 0.5); }
+            50% { box-shadow: 0 0 40px rgba(255, 185, 0, 0.8); }
         }
 
         .free-square .cell-header {
             color: #333;
-            font-size: 0.8rem;
+            font-size: 0.9rem;
         }
 
         .free-square .cell-content {
             background: rgba(255,255,255,0.8);
             font-weight: 700;
-            color: #f57c00;
+            color: #0078D4;
             text-align: center;
             font-size: 0.85rem;
         }
@@ -667,9 +675,10 @@
             </div>
             <div class="game-right">
                 <div class="player-section" id="playerDisplay">
-                    <div class="player-name-display" style="margin: 0;">
+                    <div class="player-name-display" style="margin: 0; position: relative;">
                         <strong id="currentPlayer"></strong>
                         <div style="font-size: 0.9rem; opacity: 0.8; margin-top: 5px;" id="currentCompany"></div>
+                        <button onclick="editName()" style="position: absolute; top: -5px; right: -5px; background: none; border: none; cursor: pointer; font-size: 1rem; opacity: 0.6; transition: opacity 0.2s;" title="Edit name" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.6">✏️</button>
                     </div>
                 </div>
 
@@ -733,32 +742,33 @@
     </div>
 
     <script>
+        // Microsoft brand colors: red (#F25022), green (#7FBA00), blue (#00A4EF), yellow (#FFB900)
         const bingoItems = [
-            { text: "Use Copilot Studio to extend Dynamics", color: "yellow", category: "work" },
-            { text: "Drink less alcohol", color: "red", category: "health" },
+            { text: "Use Copilot Studio to extend Dynamics", color: "red", category: "work" },
+            { text: "Drink less alcohol", color: "green", category: "health" },
             { text: "Use Copilot to plan a holiday", color: "blue", category: "work" },
-            { text: "Learn a new AI skill", color: "green", category: "learning" },
-            { text: "Test Supplier Comm Agent", color: "purple", category: "work" },
-            { text: "Drink more water", color: "yellow", category: "health" },
-            { text: "Use Customer Payment Predictions", color: "green", category: "work" },
-            { text: "Save more money", color: "blue", category: "personal" },
-            { text: "Use the Financial Recon agent", color: "green", category: "work" },
+            { text: "Learn a new AI skill", color: "yellow", category: "learning" },
+            { text: "Test Supplier Comm Agent", color: "red", category: "work" },
+            { text: "Drink more water", color: "green", category: "health" },
+            { text: "Use Customer Payment Predictions", color: "blue", category: "work" },
+            { text: "Save more money", color: "yellow", category: "personal" },
+            { text: "Use the Financial Recon agent", color: "red", category: "work" },
             { text: "Learn a new language", color: "green", category: "learning" },
-            { text: "Read more books", color: "pink", category: "personal" },
-            { text: "Use Intelligent Budget Proposals", color: "orange", category: "work" },
-            { text: "FREE SQUARE", color: "blue", category: "free", isFree: true },
-            { text: "Use Copilot to draft emails", color: "green", category: "work" },
-            { text: "Lose weight", color: "teal", category: "health" },
-            { text: "Roll out Supplier Comm Agent", color: "yellow", category: "work" },
-            { text: "Create ERP Agent", color: "orange", category: "work" },
-            { text: "Roll out Account Recon Agent", color: "blue", category: "work" },
+            { text: "Read more books", color: "blue", category: "personal" },
+            { text: "Use Intelligent Budget Proposals", color: "yellow", category: "work" },
+            { text: "FREE SQUARE", color: "yellow", category: "free", isFree: true },
+            { text: "Use Copilot to draft emails", color: "red", category: "work" },
+            { text: "Lose weight", color: "green", category: "health" },
+            { text: "Roll out Supplier Comm Agent", color: "blue", category: "work" },
+            { text: "Create ERP Agent", color: "yellow", category: "work" },
+            { text: "Roll out Account Recon Agent", color: "red", category: "work" },
             { text: "Use the Demand Planning Insights", color: "green", category: "work" },
-            { text: "Try a new exercise or fitness goal", color: "teal", category: "health" },
+            { text: "Try a new exercise or fitness goal", color: "blue", category: "health" },
             { text: "Test Account Recon agent", color: "yellow", category: "work" },
-            { text: "Travel more", color: "orange", category: "personal" },
-            { text: "Quit a bad habit", color: "pink", category: "health" },
-            { text: "Spend more time with family", color: "purple", category: "personal" },
-            { text: "Use Cash Flow Forecasting", color: "teal", category: "work" }
+            { text: "Travel more", color: "red", category: "personal" },
+            { text: "Quit a bad habit", color: "green", category: "health" },
+            { text: "Spend more time with family", color: "blue", category: "personal" },
+            { text: "Use Cash Flow Forecasting", color: "yellow", category: "work" }
         ];
 
         let playerName = '';
@@ -1000,6 +1010,20 @@
             document.getElementById('bingoAlert').classList.remove('show');
         }
 
+        function editName() {
+            const newName = prompt('Enter your name:', playerName);
+            const newCompany = prompt('Enter your company:', companyName);
+
+            if (newName && newName.trim() && newCompany && newCompany.trim()) {
+                playerName = newName.trim();
+                companyName = newCompany.trim();
+                document.getElementById('currentPlayer').textContent = playerName;
+                document.getElementById('currentCompany').textContent = companyName;
+                renderBoard();
+                saveState();
+            }
+        }
+
         function resetBoard() {
             if (confirm('Are you sure you want to reset your progress? This will clear all your completed goals.')) {
                 markedCells = new Set();
@@ -1046,15 +1070,16 @@
                 ctx.fillText(`Player: ${playerName}`, canvas.width / 2, 70);
             }
 
+            // Microsoft brand colors for PNG export
             const colorMap = {
-                yellow: ['#ffd54f', '#ffb300'],
-                red: ['#ef5350', '#d32f2f'],
-                blue: ['#64b5f6', '#1976d2'],
-                green: ['#81c784', '#388e3c'],
-                purple: ['#ba68c8', '#7b1fa2'],
-                orange: ['#ffb74d', '#f57c00'],
-                pink: ['#f48fb1', '#c2185b'],
-                teal: ['#4db6ac', '#00796b']
+                yellow: ['#FFB900', '#E6A700'],
+                red: ['#F25022', '#D94419'],
+                blue: ['#00A4EF', '#0078D4'],
+                green: ['#7FBA00', '#6CA200'],
+                purple: ['#5C2D91', '#4B2479'],
+                orange: ['#FFB900', '#E6A700'],
+                pink: ['#F25022', '#D94419'],
+                teal: ['#00A4EF', '#0078D4']
             };
 
             shuffledBingoItems.forEach((item, index) => {
