@@ -724,7 +724,7 @@
 
     <div class="bingo-alert" id="bingoAlert">
         <h2>BINGO!</h2>
-        <p>Congratulations! You completed a line!</p>
+        <p id="bingoMessage">Congratulations! You completed a line!</p>
         <div class="bingo-count">Total Bingos: <span id="bingoCount">1</span></div>
         <div class="bingo-buttons">
             <button class="btn btn-success" onclick="shareBingo()">Share Achievement</button>
@@ -766,6 +766,41 @@
         let markedCells = new Set();
         let completedBingos = new Set();
 
+        // Seeded random number generator - same seed = same sequence
+        function seededRandom(seed) {
+            let state = seed;
+            return function() {
+                state = (state * 1103515245 + 12345) & 0x7fffffff;
+                return state / 0x7fffffff;
+            };
+        }
+
+        // Shuffle array with seed (keeps FREE SQUARE in center)
+        function shuffleWithSeed(array, seed) {
+            const rng = seededRandom(seed);
+            const freeSquare = array.find(item => item.isFree);
+            const otherItems = array.filter(item => !item.isFree);
+
+            // Fisher-Yates shuffle with seeded random
+            for (let i = otherItems.length - 1; i > 0; i--) {
+                const j = Math.floor(rng() * (i + 1));
+                [otherItems[i], otherItems[j]] = [otherItems[j], otherItems[i]];
+            }
+
+            // Insert free square at center (index 12)
+            const result = [...otherItems.slice(0, 12), freeSquare, ...otherItems.slice(12)];
+            return result;
+        }
+
+        // Get today's seed (same for everyone on same day)
+        function getTodaySeed() {
+            const today = new Date();
+            return today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
+        }
+
+        // Shuffle bingo items using today's date as seed
+        const shuffledBingoItems = shuffleWithSeed(bingoItems, getTodaySeed());
+
         function init() {
             loadState();
             if (playerName && companyName) {
@@ -803,7 +838,7 @@
             const board = document.getElementById('bingoBoard');
             board.innerHTML = '';
 
-            bingoItems.forEach((item, index) => {
+            shuffledBingoItems.forEach((item, index) => {
                 const cell = document.createElement('div');
                 cell.className = `bingo-cell color-${item.color}${markedCells.has(index) ? ' marked' : ''}${item.isFree ? ' free-square' : ''}`;
                 cell.onclick = () => toggleCell(index, cell);
@@ -832,7 +867,7 @@
         }
 
         function toggleCell(index, cellElement) {
-            if (bingoItems[index].isFree) {
+            if (shuffledBingoItems[index].isFree) {
                 markedCells.add(index);
             } else if (markedCells.has(index)) {
                 markedCells.delete(index);
@@ -925,6 +960,7 @@
         function showBingo() {
             document.getElementById('bingoCount').textContent = completedBingos.size;
             document.getElementById('bingoCountDisplay').textContent = completedBingos.size;
+            document.getElementById('bingoMessage').textContent = `Congratulations ${playerName}! You completed a line!`;
             document.getElementById('overlay').classList.add('show');
             document.getElementById('bingoAlert').classList.add('show');
             launchConfetti();
@@ -1021,7 +1057,7 @@
                 teal: ['#4db6ac', '#00796b']
             };
 
-            bingoItems.forEach((item, index) => {
+            shuffledBingoItems.forEach((item, index) => {
                 const row = Math.floor(index / 5);
                 const col = index % 5;
                 const x = padding + col * cellSize;
