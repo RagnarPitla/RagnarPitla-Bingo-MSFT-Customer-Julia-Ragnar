@@ -234,7 +234,7 @@
 
         .cell-header {
             padding: 10px 8px;
-            font-size: 0.7rem;
+            font-size: 0.9rem;
             font-weight: 700;
             color: #333;
             line-height: 1.3;
@@ -610,7 +610,7 @@
             }
 
             .cell-header {
-                font-size: 0.55rem;
+                font-size: 0.7rem;
                 padding: 6px 4px;
             }
 
@@ -809,9 +809,10 @@
                 cell.onclick = () => toggleCell(index, cell);
 
                 if (item.isFree) {
+                    const displayName = playerName && companyName ? `${playerName}-${companyName}` : (playerName || 'Your Name');
                     cell.innerHTML = `
                         <div class="cell-header">FREE SQUARE</div>
-                        <div class="cell-content">${playerName || 'Your Name'}<br><small>${companyName || ''}</small></div>
+                        <div class="cell-content">${displayName}</div>
                     `;
                 } else {
                     cell.innerHTML = `
