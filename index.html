@@ -802,18 +802,26 @@
             return result;
         }
 
-        // Get today's seed (same for everyone on same day)
-        function getTodaySeed() {
-            const today = new Date();
-            return today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
+        // Get seed from user name (unique board per user)
+        function getUserSeed(name, company) {
+            const str = (name + company).toLowerCase();
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) {
+                const char = str.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash; // Convert to 32bit integer
+            }
+            return Math.abs(hash);
         }
 
-        // Shuffle bingo items using today's date as seed
-        const shuffledBingoItems = shuffleWithSeed(bingoItems, getTodaySeed());
+        // Shuffled items - will be set when user logs in
+        let shuffledBingoItems = [...bingoItems];
 
         function init() {
             loadState();
             if (playerName && companyName) {
+                // Shuffle based on user's name
+                shuffledBingoItems = shuffleWithSeed(bingoItems, getUserSeed(playerName, companyName));
                 showGame();
             }
         }
@@ -829,6 +837,8 @@
                 return;
             }
 
+            // Shuffle based on user's name
+            shuffledBingoItems = shuffleWithSeed(bingoItems, getUserSeed(playerName, companyName));
             saveState();
             showGame();
         }
@@ -1012,16 +1022,36 @@
 
         function editName() {
             const newName = prompt('Enter your name:', playerName);
-            const newCompany = prompt('Enter your company:', companyName);
+            if (!newName || !newName.trim()) return;
 
-            if (newName && newName.trim() && newCompany && newCompany.trim()) {
-                playerName = newName.trim();
-                companyName = newCompany.trim();
-                document.getElementById('currentPlayer').textContent = playerName;
-                document.getElementById('currentCompany').textContent = companyName;
-                renderBoard();
-                saveState();
+            const newCompany = prompt('Enter your company:', companyName);
+            if (!newCompany || !newCompany.trim()) return;
+
+            const nameChanged = newName.trim().toLowerCase() !== playerName.toLowerCase() ||
+                               newCompany.trim().toLowerCase() !== companyName.toLowerCase();
+
+            if (nameChanged) {
+                if (!confirm('Changing your name will give you a new randomized board and reset your progress. Continue?')) {
+                    return;
+                }
+                // Reset progress for new board
+                markedCells = new Set();
+                completedBingos = new Set();
+                markedCells.add(12); // Mark free square
             }
+
+            playerName = newName.trim();
+            companyName = newCompany.trim();
+
+            // Re-shuffle board based on new name
+            shuffledBingoItems = shuffleWithSeed(bingoItems, getUserSeed(playerName, companyName));
+
+            document.getElementById('currentPlayer').textContent = playerName;
+            document.getElementById('currentCompany').textContent = companyName;
+            document.getElementById('bingoCountDisplay').textContent = completedBingos.size;
+            renderBoard();
+            updateProgress();
+            saveState();
         }
 
         function resetBoard() {
