@@ -1233,7 +1233,7 @@
             const ctx = canvas.getContext('2d');
             const cellSize = 120;
             const padding = 20;
-            const headerHeight = 80;
+            const headerHeight = 100;
             const footerHeight = 60;
             const boardSize = cellSize * 5;
 
@@ -1252,15 +1252,21 @@
             ctx.fillStyle = 'white';
             ctx.font = 'bold 28px Segoe UI, sans-serif';
             ctx.textAlign = 'center';
-            ctx.fillText('Dynamics Champions BINGO', canvas.width / 2, 45);
+            ctx.fillText('Dynamics Champions BINGO', canvas.width / 2, 40);
 
             if (playerName && companyName) {
                 ctx.font = '16px Segoe UI, sans-serif';
-                ctx.fillText(`${playerName} | ${companyName}`, canvas.width / 2, 70);
+                ctx.fillText(`${playerName} | ${companyName}`, canvas.width / 2, 65);
             } else if (playerName) {
                 ctx.font = '16px Segoe UI, sans-serif';
-                ctx.fillText(`Player: ${playerName}`, canvas.width / 2, 70);
+                ctx.fillText(`Player: ${playerName}`, canvas.width / 2, 65);
             }
+
+            // Current date
+            const today = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            ctx.font = '14px Segoe UI, sans-serif';
+            ctx.fillStyle = 'rgba(255,255,255,0.85)';
+            ctx.fillText(today, canvas.width / 2, 88);
 
             // Microsoft brand colors for PNG export
             const colorMap = {
