@@ -303,7 +303,7 @@
             bottom: 0;
             background: rgba(0, 128, 0, 0.5);
             z-index: 5;
-            border-radius: 12px;
+            border-radius: inherit;
         }
 
         .bingo-cell.marked::after {
@@ -654,6 +654,15 @@
                 min-width: 0;
             }
 
+            .bingo-cell {
+                border-radius: 8px;
+            }
+
+            .cell-header {
+                margin: 3px;
+                border-radius: 6px;
+            }
+
             .bingo-board {
                 gap: 6px;
                 padding: 12px;
@@ -693,6 +702,15 @@
         }
 
         @media (max-width: 400px) {
+            .bingo-cell {
+                border-radius: 6px;
+            }
+
+            .cell-header {
+                margin: 2px;
+                border-radius: 4px;
+            }
+
             .bingo-board {
                 gap: 4px;
                 padding: 8px;
