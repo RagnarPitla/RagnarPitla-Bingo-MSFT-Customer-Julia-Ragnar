@@ -862,6 +862,10 @@
             <button class="btn btn-danger" onclick="confirmReset()">Yes, Reset</button>
             <button class="btn btn-secondary" onclick="closeConfirmModal()">Cancel</button>
         </div>
+        <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #eee;">
+            <button class="btn btn-primary" onclick="restartApp()">Restart</button>
+            <p style="color: #999; font-size: 0.8rem; margin-top: 8px;">Go back to sign in page</p>
+        </div>
     </div>
 
     <div class="bingo-alert" id="bingoAlert">
@@ -1213,6 +1217,11 @@
         function closeConfirmModal() {
             document.getElementById('confirmModal').classList.remove('show');
             document.getElementById('overlay').classList.remove('show');
+        }
+
+        function restartApp() {
+            localStorage.removeItem('bingoState');
+            location.reload();
         }
 
         function shareProgress() {
