@@ -938,6 +938,10 @@
             updateProgress();
         }
 
+        function truncateText(text, maxLength = 25) {
+            return text.length > maxLength ? text.substring(0, maxLength - 3) + '...' : text;
+        }
+
         function renderBoard() {
             const board = document.getElementById('bingoBoard');
             board.innerHTML = '';
@@ -961,7 +965,7 @@
                     `;
                 } else {
                     cell.innerHTML = `
-                        <div class="cell-header">${item.text}</div>
+                        <div class="cell-header" title="${item.text}">${truncateText(item.text)}</div>
                     `;
                 }
 
