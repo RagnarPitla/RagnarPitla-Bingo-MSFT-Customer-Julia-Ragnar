@@ -1085,8 +1085,10 @@
 
         function updateProgress() {
             const count = markedCells.size;
-            document.getElementById('progressCount').textContent = count;
-            document.getElementById('progressFill').style.width = `${(count / 25) * 100}%`;
+            const progressCount = document.getElementById('progressCount');
+            const progressFill = document.getElementById('progressFill');
+            if (progressCount) progressCount.textContent = count;
+            if (progressFill) progressFill.style.width = `${(count / 25) * 100}%`;
         }
 
         function checkBingo() {
