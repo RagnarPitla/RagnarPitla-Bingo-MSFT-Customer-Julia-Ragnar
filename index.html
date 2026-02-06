@@ -1005,9 +1005,8 @@
                 };
 
                 if (item.isFree) {
-                    const displayName = playerName && companyName ? `${playerName}-${companyName}` : (playerName || 'Your Name');
                     cell.innerHTML = `
-                        <div class="cell-header">FREE SPACE<span class="player-name">${displayName}</span></div>
+                        <div class="cell-header">FREE SPACE</div>
                     `;
                 } else {
                     cell.innerHTML = `
