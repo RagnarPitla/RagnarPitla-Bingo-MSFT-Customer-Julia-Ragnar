@@ -184,6 +184,16 @@
             box-shadow: 0 8px 25px rgba(56, 239, 125, 0.4);
         }
 
+        .btn-danger {
+            background: linear-gradient(135deg, #F25022 0%, #D94419 100%);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(242, 80, 34, 0.4);
+        }
+
         .btn:focus-visible {
             outline: 3px solid #667eea;
             outline-offset: 3px;
@@ -578,7 +588,7 @@
         }
 
         /* Share modal */
-        .share-modal {
+        .share-modal, .confirm-modal {
             position: fixed;
             top: 50%;
             left: 50%;
@@ -595,7 +605,7 @@
             width: 90%;
         }
 
-        .share-modal.show {
+        .share-modal.show, .confirm-modal.show {
             transform: translate(-50%, -50%) scale(1);
             opacity: 1;
         }
@@ -851,6 +861,15 @@
                 <span>💾</span> Save Image
             </button>
             <button class="btn btn-secondary" onclick="closeShareModal()">Done</button>
+        </div>
+    </div>
+
+    <div class="confirm-modal" id="confirmModal">
+        <h3>Are you sure you want to reset the board?</h3>
+        <p style="color: #666; margin: 15px 0;">This will clear all your completed goals.</p>
+        <div class="share-buttons">
+            <button class="btn btn-danger" onclick="confirmReset()">Yes, Reset</button>
+            <button class="btn btn-secondary" onclick="closeConfirmModal()">Cancel</button>
         </div>
     </div>
 
@@ -1184,15 +1203,24 @@
         }
 
         function resetBoard() {
-            if (confirm('Are you sure you want to reset your progress? This will clear all your completed goals.')) {
-                markedCells = new Set();
-                completedBingos = new Set();
-                markedCells.add(12);
-                document.getElementById('bingoCountDisplay').textContent = '0';
-                renderBoard();
-                updateProgress();
-                saveState();
-            }
+            document.getElementById('confirmModal').classList.add('show');
+            document.getElementById('overlay').classList.add('show');
+        }
+
+        function confirmReset() {
+            markedCells = new Set();
+            completedBingos = new Set();
+            markedCells.add(12);
+            document.getElementById('bingoCountDisplay').textContent = '0';
+            renderBoard();
+            updateProgress();
+            saveState();
+            closeConfirmModal();
+        }
+
+        function closeConfirmModal() {
+            document.getElementById('confirmModal').classList.remove('show');
+            document.getElementById('overlay').classList.remove('show');
         }
 
         function shareProgress() {
@@ -1372,6 +1400,7 @@
         function closeModals() {
             closeBingo();
             closeShareModal();
+            closeConfirmModal();
         }
 
         function saveImage() {
