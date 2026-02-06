@@ -1280,39 +1280,89 @@
                 const x = padding + col * cellSize;
                 const y = headerHeight + padding + row * cellSize;
                 const isMarked = markedCells.has(index);
+                const isFreeSquare = index === 12;
 
                 // Cell gradient background
-                const colors = colorMap[item.color] || ['#ccc', '#999'];
+                let colors;
+                if (isFreeSquare) {
+                    colors = ['#FF6600', '#FF9900'];
+                } else {
+                    colors = colorMap[item.color] || ['#ccc', '#999'];
+                }
                 const cellGradient = ctx.createLinearGradient(x, y, x + cellSize, y + cellSize);
                 cellGradient.addColorStop(0, colors[0]);
                 cellGradient.addColorStop(1, colors[1]);
                 ctx.fillStyle = cellGradient;
                 ctx.beginPath();
-                ctx.roundRect(x + 2, y + 2, cellSize - 4, cellSize - 4, 8);
+                ctx.roundRect(x + 2, y + 2, cellSize - 4, cellSize - 4, 12);
                 ctx.fill();
 
-                // Inner white area
-                ctx.fillStyle = isMarked ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.9)';
+                // Inner white rounded box (cell-header style) - fills most of the cell
+                ctx.fillStyle = 'rgba(255,255,255,0.85)';
                 ctx.beginPath();
-                ctx.roundRect(x + 6, y + 28, cellSize - 12, cellSize - 34, 4);
+                ctx.roundRect(x + 6, y + 6, cellSize - 12, cellSize - 12, 8);
                 ctx.fill();
 
-                // Draw header text
-                ctx.fillStyle = item.color === 'red' ? 'white' : '#333';
-                ctx.font = 'bold 10px Segoe UI, sans-serif';
-                const headerText = item.text.length > 20 ? item.text.substring(0, 18) + '...' : item.text;
-                ctx.fillText(headerText, x + cellSize / 2, y + 18, cellSize - 10);
+                // Draw cell text centered in the white box
+                ctx.fillStyle = '#000';
+                ctx.font = 'bold 11px Segoe UI, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                
+                // Word wrap the text
+                const maxWidth = cellSize - 20;
+                const words = item.text.split(' ');
+                let lines = [];
+                let currentLine = '';
+                
+                words.forEach(word => {
+                    const testLine = currentLine ? currentLine + ' ' + word : word;
+                    const metrics = ctx.measureText(testLine);
+                    if (metrics.width > maxWidth && currentLine) {
+                        lines.push(currentLine);
+                        currentLine = word;
+                    } else {
+                        currentLine = testLine;
+                    }
+                });
+                if (currentLine) lines.push(currentLine);
+                
+                // Limit to 3 lines with ellipsis
+                if (lines.length > 3) {
+                    lines = lines.slice(0, 3);
+                    lines[2] = lines[2].substring(0, lines[2].length - 3) + '...';
+                }
+                
+                const lineHeight = 14;
+                const totalTextHeight = lines.length * lineHeight;
+                const textStartY = y + cellSize / 2 - totalTextHeight / 2 + lineHeight / 2;
+                
+                lines.forEach((line, i) => {
+                    ctx.fillText(line, x + cellSize / 2, textStartY + i * lineHeight);
+                });
 
-                // Draw checkmark if marked
+                // Draw green overlay and checkmark if marked
                 if (isMarked) {
+                    // Green overlay
+                    ctx.fillStyle = 'rgba(0, 128, 0, 0.5)';
+                    ctx.beginPath();
+                    ctx.roundRect(x + 3, y + 3, cellSize - 6, cellSize - 6, 12);
+                    ctx.fill();
+                    
+                    // White checkmark
                     ctx.fillStyle = 'white';
-                    ctx.font = 'bold 45px sans-serif';
-                    ctx.shadowColor = 'rgba(0,0,0,0.3)';
+                    ctx.font = 'bold 50px sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.shadowColor = 'rgba(0,0,0,0.4)';
                     ctx.shadowBlur = 4;
                     ctx.shadowOffsetX = 2;
                     ctx.shadowOffsetY = 2;
-                    ctx.fillText('✓', x + cellSize / 2, y + cellSize / 2 + 18);
+                    ctx.fillText('✓', x + cellSize / 2, y + cellSize / 2);
                     ctx.shadowColor = 'transparent';
+                    ctx.shadowBlur = 0;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
                 }
             });
 
