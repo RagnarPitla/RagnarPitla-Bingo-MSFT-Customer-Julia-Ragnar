@@ -348,6 +348,14 @@
             background: linear-gradient(to right, #FF6600 0%, #FF9900 100%) !important;
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3), 0 0 20px rgba(255, 102, 0, 0.5);
             animation: freeSquareGlow 2s ease-in-out infinite;
+            border: 3px solid #FF6600;
+        }
+
+        .free-square.marked::before {
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
         }
 
         @keyframes freeSquareGlow {
@@ -684,6 +692,13 @@
                 font-size: 2rem;
             }
 
+            .bingo-cell.marked::before {
+                top: 2px;
+                left: 2px;
+                right: 2px;
+                bottom: 2px;
+            }
+
             .header h1 {
                 font-size: 1.8rem;
             }
@@ -730,6 +745,13 @@
 
             .bingo-cell.marked::after {
                 font-size: 1.5rem;
+            }
+
+            .bingo-cell.marked::before {
+                top: 3px;
+                left: 3px;
+                right: 3px;
+                bottom: 3px;
             }
 
             .header h1 {
