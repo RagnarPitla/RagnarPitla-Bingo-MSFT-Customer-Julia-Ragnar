@@ -324,9 +324,9 @@
             transform: translate(-50%, -50%);
             font-size: 3rem;
             font-weight: bold;
-            color: white;
+            color: rgba(255, 255, 255, 0.75);
             z-index: 10;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.4);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
             animation: checkAppear 0.3s ease-out;
         }
 
@@ -1355,15 +1355,15 @@
                     ctx.roundRect(x + 3, y + 3, cellSize - 6, cellSize - 6, 12);
                     ctx.fill();
                     
-                    // White checkmark
-                    ctx.fillStyle = 'white';
+                    // Transparent checkmark
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.75)';
                     ctx.font = 'bold 50px sans-serif';
                     ctx.textAlign = 'center';
                     ctx.textBaseline = 'middle';
-                    ctx.shadowColor = 'rgba(0,0,0,0.4)';
-                    ctx.shadowBlur = 4;
-                    ctx.shadowOffsetX = 2;
-                    ctx.shadowOffsetY = 2;
+                    ctx.shadowColor = 'rgba(0,0,0,0.2)';
+                    ctx.shadowBlur = 2;
+                    ctx.shadowOffsetX = 1;
+                    ctx.shadowOffsetY = 1;
                     ctx.fillText('✓', x + cellSize / 2, y + cellSize / 2);
                     ctx.shadowColor = 'transparent';
                     ctx.shadowBlur = 0;
