@@ -781,7 +781,11 @@
         <div class="header">
             <h1>Dynamics Champions BINGO</h1>
             <p>Click squares as you complete each goal!</p>
+            <p id="currentDate" style="margin-top: 10px; font-size: 1rem; opacity: 0.85;"></p>
         </div>
+        <script>
+            document.getElementById('currentDate').textContent = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        </script>
 
         <div class="player-section" id="setupSection">
             <h2 style="text-align: center; margin-bottom: 20px; color: #333;">Welcome! Enter your details to start playing</h2>
