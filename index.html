@@ -660,9 +660,9 @@
             }
 
             .cell-header {
-                font-size: 0.65rem;
+                font-size: 0.55rem;
                 padding: 5px 3px;
-                line-height: 1.2;
+                line-height: 1.15;
             }
 
             .cell-content {
@@ -699,8 +699,8 @@
             }
 
             .cell-header {
-                font-size: 0.6rem;
-                padding: 4px 2px;
+                font-size: 0.45rem;
+                padding: 3px 2px;
                 line-height: 1.1;
             }
 
@@ -938,10 +938,6 @@
             updateProgress();
         }
 
-        function truncateText(text, maxLength = 25) {
-            return text.length > maxLength ? text.substring(0, maxLength - 3) + '...' : text;
-        }
-
         function renderBoard() {
             const board = document.getElementById('bingoBoard');
             board.innerHTML = '';
@@ -965,7 +961,7 @@
                     `;
                 } else {
                     cell.innerHTML = `
-                        <div class="cell-header" title="${item.text}">${truncateText(item.text)}</div>
+                        <div class="cell-header">${item.text}</div>
                     `;
                 }
 
