@@ -5,7 +5,9 @@
   "scripts": {
     "start": "npx serve .",
     "deploy": "npm run build && swa deploy ./dist --env production",
-    "build": "mkdir -p dist && cp index.html staticwebapp.config.json dist/"
+    "build": "mkdir -p dist && cp index.html staticwebapp.config.json dist/ && cd \"Matching Game Code/project\" && npm run build && mkdir -p ../../dist/matching-game && cp -r dist/* ../../dist/matching-game/",
+    "build:win": "if not exist dist mkdir dist && copy index.html dist\\ && copy staticwebapp.config.json dist\\ && cd \"Matching Game Code\\project\" && npm run build && if not exist ..\\..\\dist\\matching-game mkdir ..\\..\\dist\\matching-game && xcopy /E /Y dist\\* ..\\..\\dist\\matching-game\\",
+    "install:all": "npm install && cd \"Matching Game Code/project\" && npm install"
   },
   "devDependencies": {
     "@azure/static-web-apps-cli": "^2.0.8",

@@ -1,0 +1,93 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 222 47% 8%;
+    --foreground: 210 40% 92%;
+
+    --card: 222 40% 12%;
+    --card-foreground: 210 40% 92%;
+
+    --popover: 222 40% 12%;
+    --popover-foreground: 210 40% 92%;
+
+    --primary: 300 60% 60%;
+    --primary-foreground: 222 47% 8%;
+
+    --secondary: 222 30% 18%;
+    --secondary-foreground: 210 40% 92%;
+
+    --muted: 222 30% 16%;
+    --muted-foreground: 215 20% 55%;
+
+    --accent: 300 60% 60%;
+    --accent-foreground: 222 47% 8%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 222 30% 22%;
+    --input: 222 30% 18%;
+    --ring: 300 60% 60%;
+
+    --radius: 0.75rem;
+
+    --card-glow: 300 80% 50%;
+    --card-selected: 300 60% 60%;
+    --success: 160 60% 45%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans;
+    font-family: 'Inter', sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Space Grotesk', sans-serif;
+  }
+}
+
+@layer utilities {
+  .card-glow {
+    box-shadow: 0 0 30px -5px hsl(var(--card-glow) / 0.3),
+                0 0 60px -10px hsl(var(--card-glow) / 0.15);
+  }
+
+  .card-glow-selected {
+    box-shadow: 0 0 40px -5px hsl(var(--card-glow) / 0.5),
+                0 0 80px -10px hsl(var(--card-glow) / 0.25);
+  }
+}
+
+@keyframes flip {
+  0% { transform: rotateY(0deg) scale(1); }
+  50% { transform: rotateY(90deg) scale(1.05); }
+  100% { transform: rotateY(0deg) scale(1); }
+}
+
+.animate-flip {
+  animation: flip 0.4s ease-in-out;
+}
+
+@keyframes sign-glow {
+  0%, 100% {
+    filter: drop-shadow(0 0 12px hsl(45, 100%, 60%)) drop-shadow(0 0 30px hsl(30, 100%, 50% / 0.4));
+  }
+  50% {
+    filter: drop-shadow(0 0 20px hsl(45, 100%, 70%)) drop-shadow(0 0 50px hsl(30, 100%, 55% / 0.6));
+  }
+}
+
+.animate-sign-glow {
+  animation: sign-glow 2.5s ease-in-out infinite;
+}

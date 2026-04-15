@@ -3,7 +3,7 @@
   "configurations": {
     "bingo-app": {
       "appLocation": ".",
-      "outputLocation": ".",
+      "outputLocation": "dist",
       "appName": "Bingo-Dynamics"
     }
   }

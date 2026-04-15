@@ -1,0 +1,101 @@
+CUSTOMERACCOUNT,ORGANIZATIONNAME,CUSTOMERTYPE,CUSTOMERGROUPID,ADDRESSDESCRIPTION,ADDRESSSTREET,ADDRESSCITY,ADDRESSSTATEID,ADDRESSZIPCODE,ADDRESSCOUNTRYREGIONID,CURRENCYCODE,LANGUAGEID,PAYMENTTERMSNAME,SALESTAXGROUP,INVOICEACCOUNT
+CUST-0001,Oak Brook Organics Corp.,Organization,20,Primary,250 Commerce Dr,Buffalo,NY,14201,US,USD,en-us,COD,ExemptUS,CUST-0001
+CUST-0002,Pioneer Star Provisions Ltd.,Organization,10,Primary,710 Freight Ln,Seattle,WA,98101,US,USD,en-us,Net90,ExemptUS,CUST-0002
+CUST-0003,Southern Creek Pantry Foods LLC,Organization,20,Primary,620 Produce Ln,Sacramento,CA,95814,US,USD,en-us,2%10Net30,TaxableUS,CUST-0003
+CUST-0004,Sunrise Ridge Pantry Foods LLC,Organization,20,Primary,3400 Harvest Rd,Louisville,KY,40201,US,USD,en-us,2%10Net30,ExemptUS,CUST-0004
+CUST-0005,Frontier Creek Organics Corp.,Organization,10,Primary,620 Produce Ln,Nashville,TN,37201,US,USD,en-us,Net90,ExemptUS,CUST-0005
+CUST-0006,Summit Harbor Food Supply Co.,Organization,30,Primary,1750 Trade Center Dr,Newark,NJ,07101,US,USD,en-us,Net30,ExemptUS,CUST-0006
+CUST-0007,Crestview Star Cannery LLC,Organization,30,Primary,800 Warehouse Ave,Baltimore,MD,21201,US,USD,en-us,Net30,ExemptUS,CUST-0007
+CUST-0008,Pioneer Cove Pantry Foods LLC,Organization,20,Primary,1200 Distribution Pkwy,Columbus,OH,43201,US,USD,en-us,COD,ExemptUS,CUST-0008
+CUST-0009,National Orchard Food Products Inc.,Organization,10,Primary,320 Mill Rd,Chicago,IL,60601,US,USD,en-us,Net90,TaxableUS,CUST-0009
+CUST-0010,Pioneer Point Foods Inc.,Organization,10,Primary,800 Warehouse Ave,Minneapolis,MN,55401,US,USD,en-us,Net60,TaxableUS,CUST-0010
+CUST-0011,Prairie Peak Food Supply Co.,Organization,20,Primary,320 Mill Rd,Philadelphia,PA,19101,US,USD,en-us,Net90,ExemptUS,CUST-0011
+CUST-0012,Southern Point Provisions Ltd.,Organization,30,Primary,475 Factory Ln,Atlanta,GA,30301,US,USD,en-us,Net90,ExemptUS,CUST-0012
+CUST-0013,Great Lakes Glen Kitchen Co.,Organization,30,Primary,620 Produce Ln,Newark,NJ,07101,US,USD,en-us,Net90,TaxableUS,CUST-0013
+CUST-0014,American Creek Provisions Ltd.,Organization,20,Primary,475 Factory Ln,Louisville,KY,40201,US,USD,en-us,Net90,ExemptUS,CUST-0014
+CUST-0015,Golden Bay Farms Canning LLC,Organization,20,Primary,320 Mill Rd,Nashville,TN,37201,US,USD,en-us,Net90,TaxableUS,CUST-0015
+CUST-0016,Harvest Cove Processing Inc.,Organization,20,Primary,2250 Supply Chain Rd,Pittsburgh,PA,15201,US,USD,en-us,Net30,ExemptUS,CUST-0016
+CUST-0017,National Ridge Provisions Ltd.,Organization,10,Primary,150 Processing Dr,Houston,TX,77001,US,USD,en-us,2%10Net30,ExemptUS,CUST-0017
+CUST-0018,Riverside Fields Select Foods Ltd.,Organization,30,Primary,560 Depot Ave,Columbus,OH,43201,US,USD,en-us,Net90,ExemptUS,CUST-0018
+CUST-0019,Western Glen Provisions Ltd.,Organization,20,Primary,800 Warehouse Ave,Pittsburgh,PA,15201,US,USD,en-us,COD,ExemptUS,CUST-0019
+CUST-0020,Red River Bay Canned Goods Corp.,Organization,10,Primary,1200 Distribution Pkwy,Pittsburgh,PA,15201,US,USD,en-us,Net90,TaxableUS,CUST-0020
+CUST-0021,Heritage Cove Packing Co.,Organization,10,Primary,1200 Distribution Pkwy,Detroit,MI,48201,US,USD,en-us,Net60,ExemptUS,CUST-0021
+CUST-0022,Cedar Creek Farms Canning LLC,Organization,10,Primary,620 Produce Ln,Minneapolis,MN,55401,US,USD,en-us,COD,TaxableUS,CUST-0022
+CUST-0023,Premier Garden Food Products Inc.,Organization,10,Primary,800 Warehouse Ave,Philadelphia,PA,19101,US,USD,en-us,COD,TaxableUS,CUST-0023
+CUST-0024,Pioneer Ridge Kitchen Co.,Organization,30,Primary,430 Enterprise Way,Dallas,TX,75201,US,USD,en-us,Net90,ExemptUS,CUST-0024
+CUST-0025,Frontier Hill Select Foods Ltd.,Organization,10,Primary,475 Factory Ln,Indianapolis,IN,46201,US,USD,en-us,Net60,ExemptUS,CUST-0025
+CUST-0026,Blue Ridge Harbor Select Foods Ltd.,Organization,30,Primary,1300 Logistics Dr,Charlotte,NC,28201,US,USD,en-us,Net30,TaxableUS,CUST-0026
+CUST-0027,Great Lakes Meadow Farms Canning LLC,Organization,10,Primary,880 Market St,Pittsburgh,PA,15201,US,USD,en-us,Net90,TaxableUS,CUST-0027
+CUST-0028,Harvest Glen Food Supply Co.,Organization,30,Primary,1750 Trade Center Dr,Richmond,VA,23218,US,USD,en-us,2%10Net30,ExemptUS,CUST-0028
+CUST-0029,Coastal Grove Organics Corp.,Organization,10,Primary,560 Depot Ave,Kansas City,MO,64101,US,USD,en-us,COD,ExemptUS,CUST-0029
+CUST-0030,Harvest Hill Canning Co.,Organization,10,Primary,1010 Business Park Blvd,Newark,NJ,07101,US,USD,en-us,COD,TaxableUS,CUST-0030
+CUST-0031,Eagle Glen Preserves Corp.,Organization,10,Primary,800 Warehouse Ave,Tampa,FL,33601,US,USD,en-us,2%10Net30,ExemptUS,CUST-0031
+CUST-0032,Harvest Grove Harvest Foods Inc.,Organization,30,Primary,320 Mill Rd,Columbus,OH,43201,US,USD,en-us,Net90,TaxableUS,CUST-0032
+CUST-0033,Harvest Creek Provisions Ltd.,Organization,10,Primary,560 Depot Ave,Des Moines,IA,50301,US,USD,en-us,Net30,ExemptUS,CUST-0033
+CUST-0034,Crestview Point Canning Co.,Organization,10,Primary,550 Plant Way,Sacramento,CA,95814,US,USD,en-us,COD,TaxableUS,CUST-0034
+CUST-0035,Sunrise Bay Farms Canning LLC,Organization,30,Primary,620 Produce Ln,Newark,NJ,07101,US,USD,en-us,Net30,ExemptUS,CUST-0035
+CUST-0036,Eagle Orchard Processing Inc.,Organization,30,Primary,1200 Distribution Pkwy,Buffalo,NY,14201,US,USD,en-us,Net60,TaxableUS,CUST-0036
+CUST-0037,American Springs Food Supply Co.,Organization,10,Primary,100 Industrial Blvd,Columbus,OH,43201,US,USD,en-us,Net30,TaxableUS,CUST-0037
+CUST-0038,Silver Harbor Cannery LLC,Organization,20,Primary,2100 Packing Blvd,Des Moines,IA,50301,US,USD,en-us,COD,ExemptUS,CUST-0038
+CUST-0039,Riverside Harbor Cannery Corp.,Organization,30,Primary,620 Produce Ln,Atlanta,GA,30301,US,USD,en-us,Net30,TaxableUS,CUST-0039
+CUST-0040,Valley Harvest Cannery Corp.,Organization,30,Primary,1200 Distribution Pkwy,Newark,NJ,07101,US,USD,en-us,Net60,ExemptUS,CUST-0040
+CUST-0041,Prairie Fields Foods Inc.,Organization,10,Primary,3400 Harvest Rd,Columbus,OH,43201,US,USD,en-us,2%10Net30,TaxableUS,CUST-0041
+CUST-0042,Mountain Point Packing Co.,Organization,10,Primary,320 Mill Rd,Atlanta,GA,30301,US,USD,en-us,Net60,ExemptUS,CUST-0042
+CUST-0043,Harvest Stone Food Supply Co.,Organization,30,Primary,800 Warehouse Ave,Atlanta,GA,30301,US,USD,en-us,Net60,TaxableUS,CUST-0043
+CUST-0044,Valley Point Premium Foods Co.,Organization,30,Primary,430 Enterprise Way,Denver,CO,80201,US,USD,en-us,2%10Net30,TaxableUS,CUST-0044
+CUST-0045,Northern Harvest Premium Foods Co.,Organization,20,Primary,1010 Business Park Blvd,Detroit,MI,48201,US,USD,en-us,Net90,TaxableUS,CUST-0045
+CUST-0046,Cedar Grove Food Products Inc.,Organization,20,Primary,620 Produce Ln,Nashville,TN,37201,US,USD,en-us,Net60,ExemptUS,CUST-0046
+CUST-0047,American Glen Organics Corp.,Organization,30,Primary,150 Processing Dr,Houston,TX,77001,US,USD,en-us,Net60,TaxableUS,CUST-0047
+CUST-0048,Atlantic Glen Naturals Inc.,Organization,10,Primary,3400 Harvest Rd,Denver,CO,80201,US,USD,en-us,Net60,ExemptUS,CUST-0048
+CUST-0049,Prairie Harvest Cannery Corp.,Organization,30,Primary,710 Freight Ln,Atlanta,GA,30301,US,USD,en-us,COD,TaxableUS,CUST-0049
+CUST-0050,Frontier Orchard Provisions Ltd.,Organization,30,Primary,3400 Harvest Rd,Denver,CO,80201,US,USD,en-us,Net90,ExemptUS,CUST-0050
+CUST-0051,Premier Orchard Pantry Foods LLC,Organization,10,Primary,1200 Distribution Pkwy,St. Louis,MO,63101,US,USD,en-us,COD,TaxableUS,CUST-0051
+CUST-0052,American Glen Food Products Inc.,Organization,20,Primary,2100 Packing Blvd,Houston,TX,77001,US,USD,en-us,2%10Net30,ExemptUS,CUST-0052
+CUST-0053,Liberty Point Cannery Corp.,Organization,10,Primary,800 Warehouse Ave,Hartford,CT,06101,US,USD,en-us,Net30,ExemptUS,CUST-0053
+CUST-0054,Sunrise Springs Cannery Corp.,Organization,30,Primary,550 Plant Way,Richmond,VA,23218,US,USD,en-us,Net30,ExemptUS,CUST-0054
+CUST-0055,Southern Harbor Naturals Inc.,Organization,20,Primary,550 Plant Way,Pittsburgh,PA,15201,US,USD,en-us,Net60,TaxableUS,CUST-0055
+CUST-0056,Eagle Glen Farms Canning LLC,Organization,30,Primary,710 Freight Ln,Omaha,NE,68101,US,USD,en-us,COD,ExemptUS,CUST-0056
+CUST-0057,Sunrise Hill Harvest Foods Inc.,Organization,20,Primary,620 Produce Ln,Portland,OR,97201,US,USD,en-us,2%10Net30,TaxableUS,CUST-0057
+CUST-0058,Green Valley Bay Canning Co.,Organization,20,Primary,550 Plant Way,Chicago,IL,60601,US,USD,en-us,2%10Net30,TaxableUS,CUST-0058
+CUST-0059,Great Lakes Harbor Canning Co.,Organization,20,Primary,2100 Packing Blvd,Charlotte,NC,28201,US,USD,en-us,COD,TaxableUS,CUST-0059
+CUST-0060,Crestview Glen Foods Inc.,Organization,30,Primary,2250 Supply Chain Rd,Philadelphia,PA,19101,US,USD,en-us,Net90,TaxableUS,CUST-0060
+CUST-0061,Atlantic Bay Premium Foods Co.,Organization,30,Primary,620 Produce Ln,Hartford,CT,06101,US,USD,en-us,Net90,TaxableUS,CUST-0061
+CUST-0062,Pioneer Peak Cannery LLC,Organization,10,Primary,880 Market St,Pittsburgh,PA,15201,US,USD,en-us,COD,TaxableUS,CUST-0062
+CUST-0063,Heartland Harbor Organics Corp.,Organization,20,Primary,620 Produce Ln,Nashville,TN,37201,US,USD,en-us,Net30,TaxableUS,CUST-0063
+CUST-0064,Frontier Fields Preserves Corp.,Organization,20,Primary,880 Market St,Milwaukee,WI,53201,US,USD,en-us,COD,TaxableUS,CUST-0064
+CUST-0065,Oak Brook Harvest Foods Inc.,Organization,30,Primary,250 Commerce Dr,Philadelphia,PA,19101,US,USD,en-us,COD,TaxableUS,CUST-0065
+CUST-0066,Sunrise Stone Cannery LLC,Organization,30,Primary,710 Freight Ln,Baltimore,MD,21201,US,USD,en-us,Net30,TaxableUS,CUST-0066
+CUST-0067,Blue Ridge Dale Packing Co.,Organization,10,Primary,1200 Distribution Pkwy,Boston,MA,02101,US,USD,en-us,Net90,TaxableUS,CUST-0067
+CUST-0068,Pacific Hill Kitchen Co.,Organization,20,Primary,1010 Business Park Blvd,Newark,NJ,07101,US,USD,en-us,Net30,TaxableUS,CUST-0068
+CUST-0069,Crestview Meadow Pantry Foods LLC,Organization,10,Primary,150 Processing Dr,Detroit,MI,48201,US,USD,en-us,Net60,TaxableUS,CUST-0069
+CUST-0070,Heritage Bay Processing Inc.,Organization,10,Primary,3400 Harvest Rd,Omaha,NE,68101,US,USD,en-us,2%10Net30,TaxableUS,CUST-0070
+CUST-0071,Eastern Bay Harvest Foods Inc.,Organization,20,Primary,150 Processing Dr,Columbus,OH,43201,US,USD,en-us,Net90,ExemptUS,CUST-0071
+CUST-0072,Sunset Ridge Packing Co.,Organization,30,Primary,3400 Harvest Rd,Denver,CO,80201,US,USD,en-us,COD,ExemptUS,CUST-0072
+CUST-0073,Premier Point Premium Foods Co.,Organization,20,Primary,1750 Trade Center Dr,Indianapolis,IN,46201,US,USD,en-us,Net60,TaxableUS,CUST-0073
+CUST-0074,Pacific Cove Canning Co.,Organization,20,Primary,880 Market St,Buffalo,NY,14201,US,USD,en-us,Net90,TaxableUS,CUST-0074
+CUST-0075,Red River Creek Kitchen Co.,Organization,10,Primary,2100 Packing Blvd,Dallas,TX,75201,US,USD,en-us,2%10Net30,ExemptUS,CUST-0075
+CUST-0076,Riverside Star Cannery Corp.,Organization,30,Primary,150 Processing Dr,Pittsburgh,PA,15201,US,USD,en-us,Net30,TaxableUS,CUST-0076
+CUST-0077,Premier Meadow Food Products Inc.,Organization,10,Primary,1200 Distribution Pkwy,Milwaukee,WI,53201,US,USD,en-us,2%10Net30,TaxableUS,CUST-0077
+CUST-0078,Riverside Harbor Farms Canning LLC,Organization,10,Primary,2250 Supply Chain Rd,Houston,TX,77001,US,USD,en-us,Net60,TaxableUS,CUST-0078
+CUST-0079,Mountain Glen Canned Goods Corp.,Organization,30,Primary,1750 Trade Center Dr,Portland,OR,97201,US,USD,en-us,COD,TaxableUS,CUST-0079
+CUST-0080,Valley Star Canned Goods Corp.,Organization,10,Primary,475 Factory Ln,Nashville,TN,37201,US,USD,en-us,Net30,TaxableUS,CUST-0080
+CUST-0081,Northern Hill Organics Corp.,Organization,10,Primary,710 Freight Ln,Houston,TX,77001,US,USD,en-us,Net90,ExemptUS,CUST-0081
+CUST-0082,Premier Point Foods Inc.,Organization,10,Primary,1200 Distribution Pkwy,Memphis,TN,38101,US,USD,en-us,Net60,TaxableUS,CUST-0082
+CUST-0083,Eastern Creek Premium Foods Co.,Organization,10,Primary,430 Enterprise Way,Denver,CO,80201,US,USD,en-us,2%10Net30,ExemptUS,CUST-0083
+CUST-0084,Valley Creek Provisions Ltd.,Organization,30,Primary,880 Market St,Newark,NJ,07101,US,USD,en-us,Net30,ExemptUS,CUST-0084
+CUST-0085,Golden Point Organics Corp.,Organization,20,Primary,2100 Packing Blvd,Richmond,VA,23218,US,USD,en-us,2%10Net30,ExemptUS,CUST-0085
+CUST-0086,Red River Glen Foods Inc.,Organization,10,Primary,150 Processing Dr,Columbus,OH,43201,US,USD,en-us,2%10Net30,ExemptUS,CUST-0086
+CUST-0087,American Dale Organics Corp.,Organization,30,Primary,1200 Distribution Pkwy,Milwaukee,WI,53201,US,USD,en-us,Net90,TaxableUS,CUST-0087
+CUST-0088,Northern Creek Foods Inc.,Organization,10,Primary,3400 Harvest Rd,Denver,CO,80201,US,USD,en-us,Net60,ExemptUS,CUST-0088
+CUST-0089,Heartland Peak Processing Inc.,Organization,30,Primary,430 Enterprise Way,Des Moines,IA,50301,US,USD,en-us,Net60,TaxableUS,CUST-0089
+CUST-0090,Green Valley Star Harvest Foods Inc.,Organization,20,Primary,560 Depot Ave,Nashville,TN,37201,US,USD,en-us,Net60,TaxableUS,CUST-0090
+CUST-0091,Riverside Grove Naturals Inc.,Organization,20,Primary,1750 Trade Center Dr,Buffalo,NY,14201,US,USD,en-us,COD,ExemptUS,CUST-0091
+CUST-0092,Atlantic Star Select Foods Ltd.,Organization,30,Primary,550 Plant Way,Chicago,IL,60601,US,USD,en-us,Net60,TaxableUS,CUST-0092
+CUST-0093,Eastern Orchard Canning Co.,Organization,30,Primary,150 Processing Dr,Houston,TX,77001,US,USD,en-us,Net60,ExemptUS,CUST-0093
+CUST-0094,Southern Stone Cannery LLC,Organization,20,Primary,1010 Business Park Blvd,Dallas,TX,75201,US,USD,en-us,2%10Net30,ExemptUS,CUST-0094
+CUST-0095,Crestview Meadow Naturals Inc.,Organization,10,Primary,800 Warehouse Ave,Chicago,IL,60601,US,USD,en-us,Net90,TaxableUS,CUST-0095
+CUST-0096,Pioneer Ridge Provisions Ltd.,Organization,30,Primary,2100 Packing Blvd,Baltimore,MD,21201,US,USD,en-us,Net90,TaxableUS,CUST-0096
+CUST-0097,Green Valley Grove Kitchen Co.,Organization,30,Primary,560 Depot Ave,Philadelphia,PA,19101,US,USD,en-us,COD,TaxableUS,CUST-0097
+CUST-0098,Golden Stone Harvest Foods Inc.,Organization,20,Primary,1750 Trade Center Dr,Sacramento,CA,95814,US,USD,en-us,COD,ExemptUS,CUST-0098
+CUST-0099,Summit Dale Kitchen Co.,Organization,20,Primary,800 Warehouse Ave,Minneapolis,MN,55401,US,USD,en-us,Net30,ExemptUS,CUST-0099
+CUST-0100,Heritage Hill Farms Canning LLC,Organization,30,Primary,880 Market St,Newark,NJ,07101,US,USD,en-us,2%10Net30,TaxableUS,CUST-0100

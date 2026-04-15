@@ -1,0 +1,1 @@
+ALTER TABLE public.participants ADD COLUMN role text NOT NULL DEFAULT 'player';
