@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { getAgentColor } from "@/data/agentColors";
 
 interface AnimatedPersonProps {
   name: string;
@@ -63,18 +64,9 @@ export function AnimatedPerson({
 
   const colors = AVATAR_COLORS[index % AVATAR_COLORS.length];
 
-  // Assign a distinct colour to each agent slot by position in cardTitles
-  const DOT_COLORS = [
-    "hsl(210, 75%, 60%)",
-    "hsl(140, 65%, 50%)",
-    "hsl(35, 85%, 58%)",
-    "hsl(280, 65%, 65%)",
-    "hsl(0, 70%, 60%)",
-    "hsl(180, 60%, 50%)",
-  ];
+  // Colour each dot by the agent's position in cardTitles (matches legend)
   const cardKeys = Object.keys(cardTitles);
-  const getCardColor = (key: string) =>
-    DOT_COLORS[cardKeys.indexOf(key) % DOT_COLORS.length];
+  const getCardColor = (key: string) => getAgentColor(cardKeys.indexOf(key));
 
   return (
     <div

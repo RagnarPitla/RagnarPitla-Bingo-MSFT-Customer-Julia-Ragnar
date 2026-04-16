@@ -6,6 +6,7 @@ import { CardDeck } from "@/components/CardDeck";
 import { RevealedCard } from "@/components/RevealedCard";
 import { useToast } from "@/hooks/use-toast";
 import { exportSelectionsToExcel } from "@/utils/exportSelections";
+import { getAgentColor } from "@/data/agentColors";
 
 interface Participant {
   id: string;
@@ -289,6 +290,26 @@ export function PokerTable({ participant, onRestart }: PokerTableProps) {
             .filter((s) => s.agent_key === viewingAgent.key)
             .map((s) => ({ name: s.name, company: s.company }))}
         />
+      )}
+
+      {/* Agent colour legend — builds as cards are flipped */}
+      {currentCardIndex >= 0 && (
+        <div className="z-30 mt-4 w-full max-w-lg">
+          <div className="bg-black/40 border border-white/10 rounded-xl p-4 backdrop-blur-sm">
+            <h3 className="text-xs font-semibold uppercase tracking-wider text-primary mb-2">Card Legend</h3>
+            <div className="flex flex-col gap-1.5">
+              {agents.slice(0, currentCardIndex + 1).map((agent, i) => (
+                <div key={agent.key} className="flex items-center gap-2">
+                  <div
+                    className="w-3 h-3 rounded-full flex-shrink-0"
+                    style={{ background: getAgentColor(i) }}
+                  />
+                  <span className="text-xs text-muted-foreground">{agent.title}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
       )}
 
       {/* How to Play */}
