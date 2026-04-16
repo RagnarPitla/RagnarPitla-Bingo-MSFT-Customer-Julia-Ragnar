@@ -5,7 +5,7 @@ import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
-  base: "/RagnarPitla-Bingo-MSFT-Customer-Julia-Ragnar/matching-game/",
+  base: "/matching-game/",
   server: {
     host: "::",
     port: 8080,

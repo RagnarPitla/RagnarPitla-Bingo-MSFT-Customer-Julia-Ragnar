@@ -23,7 +23,7 @@ export function SignInForm({ onSignIn, loading }: SignInFormProps) {
     <div
       className="min-h-screen flex items-center justify-center p-4 relative"
       style={{
-        backgroundImage: "url('/images/casino-bg.png')",
+        backgroundImage: `url('${import.meta.env.BASE_URL}images/casino-bg.png')`,
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
@@ -33,7 +33,7 @@ export function SignInForm({ onSignIn, loading }: SignInFormProps) {
       <div className="w-full max-w-md z-10">
         <div className="text-center mb-8">
           <img
-            src="/images/casino-sign.png"
+            src={`${import.meta.env.BASE_URL}images/casino-sign.png`}
             alt="Dynamics Agents"
             className="mx-auto h-36 md:h-48 w-auto drop-shadow-2xl mb-4 animate-sign-glow"
           />
