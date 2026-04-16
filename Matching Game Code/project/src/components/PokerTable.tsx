@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { agents } from "@/data/agents";
 import { AnimatedPerson } from "@/components/AnimatedPerson";
@@ -32,6 +32,7 @@ export function PokerTable({ participant, onRestart }: PokerTableProps) {
   const [currentCardIndex, setCurrentCardIndex] = useState(-1);
   const [gameStateId, setGameStateId] = useState<string | null>(null);
   const [showCard, setShowCard] = useState(false);
+  const lastCardIndexRef = useRef(-2); // -2 = not yet initialised
   const { toast } = useToast();
 
   const isDealer = participant.role === "dealer";
@@ -48,10 +49,14 @@ export function PokerTable({ participant, onRestart }: PokerTableProps) {
 
     if (parts) setParticipants(parts.map(p => ({ ...p, role: p.role as "dealer" | "player" })));
     if (gs) {
-      if (gs.current_card_index !== currentCardIndex && gs.current_card_index >= 0) {
+      const prevIndex = lastCardIndexRef.current;
+      const newIndex = gs.current_card_index;
+      // Only show card overlay when the index actually advances (not on initial load)
+      if (prevIndex !== -2 && newIndex !== prevIndex && newIndex >= 0) {
         setShowCard(true);
       }
-      setCurrentCardIndex(gs.current_card_index);
+      lastCardIndexRef.current = newIndex;
+      setCurrentCardIndex(newIndex);
       setGameStateId(gs.id);
     }
     if (sels && parts) {

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { SignInForm } from "@/components/SignInForm";
 import { PokerTable } from "@/components/PokerTable";
@@ -16,6 +16,20 @@ const Index = () => {
   const [testMode, setTestMode] = useState(false);
   const [testParticipants, setTestParticipants] = useState<Participant[]>([]);
   const [activeTestIndex, setActiveTestIndex] = useState(0);
+  const [dealerExists, setDealerExists] = useState(false);
+
+  useEffect(() => {
+    const checkDealer = async () => {
+      const { data } = await supabase.from("participants").select("id").eq("role", "dealer");
+      setDealerExists((data?.length ?? 0) > 0);
+    };
+    checkDealer();
+    const ch = supabase
+      .channel("signin-participants")
+      .on("postgres_changes", { event: "*", schema: "public", table: "participants" }, checkDealer)
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, []);
 
   const handleRestart = async () => {
     const { data: gs } = await supabase.from("game_state").select("id").limit(1).single();
@@ -107,7 +121,7 @@ const Index = () => {
 
         <div className="pt-8">
           {participant === null ? (
-            <SignInForm onSignIn={handleSignIn} loading={loading} onRestart={handleRestart} />
+            <SignInForm onSignIn={handleSignIn} loading={loading} onRestart={handleRestart} dealerExists={dealerExists} />
           ) : (
             <PokerTable participant={active} onRestart={() => { setTestParticipants([]); setParticipant(null); setActiveTestIndex(0); }} />
           )}
@@ -125,7 +139,7 @@ const Index = () => {
           </div>
         )}
         <div className={testMode ? "pt-8" : ""}>
-          <SignInForm onSignIn={handleSignIn} loading={loading} onRestart={handleRestart} />
+          <SignInForm onSignIn={handleSignIn} loading={loading} onRestart={handleRestart} dealerExists={dealerExists} />
         </div>
         <button
           onClick={() => setTestMode(!testMode)}

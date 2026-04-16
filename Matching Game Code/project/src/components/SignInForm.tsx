@@ -6,9 +6,10 @@ interface SignInFormProps {
   onSignIn: (name: string, company: string, role: "dealer" | "player") => void;
   loading: boolean;
   onRestart?: () => void;
+  dealerExists?: boolean;
 }
 
-export function SignInForm({ onSignIn, loading, onRestart }: SignInFormProps) {
+export function SignInForm({ onSignIn, loading, onRestart, dealerExists }: SignInFormProps) {
   const [name, setName] = useState("");
   const [company, setCompany] = useState("");
   const [role, setRole] = useState<"dealer" | "player">("player");
@@ -80,14 +81,17 @@ export function SignInForm({ onSignIn, loading, onRestart }: SignInFormProps) {
               </button>
               <button
                 type="button"
-                onClick={() => setRole("dealer")}
+                onClick={() => !dealerExists && setRole("dealer")}
+                disabled={!!dealerExists}
                 className={`flex-1 px-3 py-2.5 rounded-lg border text-sm font-medium transition-all ${
-                  role === "dealer"
+                  dealerExists
+                    ? "bg-muted/40 border-border/50 text-muted-foreground/40 cursor-not-allowed"
+                    : role === "dealer"
                     ? "bg-destructive text-destructive-foreground border-destructive"
                     : "bg-muted border-border text-muted-foreground hover:text-foreground"
                 }`}
               >
-                🃏 Dealer / Admin
+                🃏 {dealerExists ? "Dealer (taken)" : "Dealer / Admin"}
               </button>
             </div>
           </div>
