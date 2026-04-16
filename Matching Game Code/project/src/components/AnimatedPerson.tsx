@@ -78,14 +78,50 @@ export function AnimatedPerson({
         transition: "left 0.5s ease, top 0.5s ease",
       }}
     >
-      {/* Glow ring for current user */}
+      {/* Golden glow for current user */}
       {isCurrentUser && (
         <div
-          className="absolute -inset-2 rounded-full animate-pulse opacity-50"
+          className="absolute -inset-2 rounded-full animate-pulse opacity-60"
           style={{
-            background: "radial-gradient(circle, hsl(300, 60%, 60%, 0.3), transparent 70%)",
+            background: "radial-gradient(circle, hsl(45, 100%, 60%, 0.35), transparent 70%)",
           }}
         />
+      )}
+
+      {/* Crown — floats above the avatar for current user */}
+      {isCurrentUser && (
+        <div
+          className="absolute z-20"
+          style={{
+            top: "-20px",
+            left: "50%",
+            transform: "translateX(-50%)",
+            filter: "drop-shadow(0 0 5px hsl(45, 100%, 65%)) drop-shadow(0 0 2px hsl(35, 80%, 40%))",
+          }}
+        >
+          <svg width="24" height="15" viewBox="0 0 24 15" fill="none">
+            {/* Crown body */}
+            <path
+              d="M1 14 L1 8.5 L6 2 L12 7.5 L18 2 L23 8.5 L23 14 Z"
+              fill="hsl(45, 95%, 52%)"
+              stroke="hsl(35, 65%, 35%)"
+              strokeWidth="0.7"
+              strokeLinejoin="round"
+            />
+            {/* Band across middle */}
+            <line x1="1" y1="10" x2="23" y2="10" stroke="hsl(35, 65%, 38%)" strokeWidth="0.6" />
+            {/* Left gem */}
+            <circle cx="6" cy="2.5" r="1.6" fill="hsl(0, 85%, 62%)" stroke="hsl(0, 55%, 40%)" strokeWidth="0.4" />
+            {/* Centre gem */}
+            <circle cx="12" cy="7.5" r="1.6" fill="hsl(220, 85%, 68%)" stroke="hsl(220, 55%, 40%)" strokeWidth="0.4" />
+            {/* Right gem */}
+            <circle cx="18" cy="2.5" r="1.6" fill="hsl(0, 85%, 62%)" stroke="hsl(0, 55%, 40%)" strokeWidth="0.4" />
+            {/* Highlight sheen */}
+            <path d="M4 10.5 L4 13" stroke="hsl(45, 100%, 75%)" strokeWidth="0.5" strokeLinecap="round" opacity="0.6" />
+            <path d="M12 10.5 L12 13" stroke="hsl(45, 100%, 75%)" strokeWidth="0.5" strokeLinecap="round" opacity="0.6" />
+            <path d="M20 10.5 L20 13" stroke="hsl(45, 100%, 75%)" strokeWidth="0.5" strokeLinecap="round" opacity="0.6" />
+          </svg>
+        </div>
       )}
 
       {/* SVG Head */}
@@ -165,13 +201,6 @@ export function AnimatedPerson({
           strokeLinecap="round"
         />
 
-        {/* Current user indicator */}
-        {isCurrentUser && (
-          <circle cx="40" cy="6" r="5" fill="hsl(300, 60%, 60%)" stroke="hsl(222, 47%, 8%)" strokeWidth="1">
-            <animate attributeName="opacity" values="1;0.5;1" dur="2s" repeatCount="indefinite" />
-          </circle>
-        )}
-
         {/* Selection count badge */}
         {selectedCards.length > 0 && (
           <g>
@@ -187,10 +216,15 @@ export function AnimatedPerson({
       <div
         className="mt-0.5 text-center px-2 py-0.5 rounded-md max-w-[80px] md:max-w-[100px]"
         style={{
-          background: isCurrentUser ? "hsl(300, 60%, 60%, 0.15)" : "hsl(222, 40%, 12%, 0.8)",
-          border: isCurrentUser ? "1px solid hsl(300, 60%, 60%, 0.3)" : "1px solid hsl(222, 30%, 22%)",
+          background: isCurrentUser ? "hsl(45, 95%, 52%, 0.12)" : "hsl(222, 40%, 12%, 0.8)",
+          border: isCurrentUser ? "1px solid hsl(45, 95%, 52%, 0.5)" : "1px solid hsl(222, 30%, 22%)",
         }}
       >
+        {isCurrentUser && (
+          <p className="text-[6px] font-bold uppercase tracking-wider leading-tight" style={{ color: "hsl(45, 95%, 60%)" }}>
+            You
+          </p>
+        )}
         <p className="text-[9px] md:text-[10px] font-semibold text-foreground truncate leading-tight">
           {name}
         </p>
