@@ -63,6 +63,19 @@ export function AnimatedPerson({
 
   const colors = AVATAR_COLORS[index % AVATAR_COLORS.length];
 
+  // Assign a distinct colour to each agent slot by position in cardTitles
+  const DOT_COLORS = [
+    "hsl(210, 75%, 60%)",
+    "hsl(140, 65%, 50%)",
+    "hsl(35, 85%, 58%)",
+    "hsl(280, 65%, 65%)",
+    "hsl(0, 70%, 60%)",
+    "hsl(180, 60%, 50%)",
+  ];
+  const cardKeys = Object.keys(cardTitles);
+  const getCardColor = (key: string) =>
+    DOT_COLORS[cardKeys.indexOf(key) % DOT_COLORS.length];
+
   return (
     <div
       className="absolute flex flex-col items-center z-10"
@@ -160,11 +173,21 @@ export function AnimatedPerson({
           strokeLinecap="round"
         />
 
-        {/* Current user indicator star */}
+        {/* Current user indicator */}
         {isCurrentUser && (
           <circle cx="40" cy="6" r="5" fill="hsl(300, 60%, 60%)" stroke="hsl(222, 47%, 8%)" strokeWidth="1">
             <animate attributeName="opacity" values="1;0.5;1" dur="2s" repeatCount="indefinite" />
           </circle>
+        )}
+
+        {/* Selection count badge */}
+        {selectedCards.length > 0 && (
+          <g>
+            <circle cx="8" cy="6" r="6" fill="hsl(160, 60%, 42%)" stroke="hsl(222, 47%, 8%)" strokeWidth="1.5" />
+            <text x="8" y="9.5" textAnchor="middle" fontSize="7" fontWeight="bold" fill="white">
+              {selectedCards.length}
+            </text>
+          </g>
         )}
       </svg>
 
@@ -184,25 +207,19 @@ export function AnimatedPerson({
         </p>
       </div>
 
-      {/* Selected cards (mini cards near the person) */}
-      {/* Selected cards (mini cards near the person) */}
-      <div className="flex gap-1 mt-1 flex-wrap justify-center max-w-[140px] md:max-w-[180px]">
-        {selectedCards.map((cardKey, i) => (
-          <div
-            key={cardKey}
-            className="w-10 h-14 md:w-12 md:h-16 rounded border-2 text-[7px] md:text-[8px] flex items-center justify-center p-1 text-center leading-tight font-bold animate-scale-in shadow-md"
-            style={{
-              background: "linear-gradient(135deg, hsl(0, 70%, 45%), hsl(0, 60%, 30%))",
-              borderColor: "hsl(40, 70%, 50%)",
-              color: "hsl(45, 90%, 90%)",
-              transform: `rotate(${(i - selectedCards.length / 2) * 4}deg)`,
-              boxShadow: "0 2px 8px hsl(0, 0%, 0%, 0.4)",
-            }}
-          >
-            {(cardTitles[cardKey] || cardKey).split(" ").slice(0, 2).join(" ")}
-          </div>
-        ))}
-      </div>
+      {/* Selection dots — one per chosen card */}
+      {selectedCards.length > 0 && (
+        <div className="flex gap-1 mt-1 justify-center flex-wrap max-w-[60px]">
+          {selectedCards.map((cardKey) => (
+            <div
+              key={cardKey}
+              className="w-2.5 h-2.5 rounded-full shadow-sm animate-scale-in"
+              style={{ background: getCardColor(cardKey) }}
+              title={cardTitles[cardKey] || cardKey}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
