@@ -20,8 +20,18 @@ const Index = () => {
 
   useEffect(() => {
     const checkDealer = async () => {
-      const { data } = await supabase.from("participants").select("id").eq("role", "dealer");
-      setDealerExists((data?.length ?? 0) > 0);
+      const [{ data: parts }, { data: gs }] = await Promise.all([
+        supabase.from("participants").select("id, created_at").eq("role", "dealer"),
+        supabase.from("game_state").select("current_card_index").limit(1).single(),
+      ]);
+      if (!parts || parts.length === 0) {
+        setDealerExists(false);
+        return;
+      }
+      const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString();
+      const dealerIsRecent = parts[0].created_at > twoHoursAgo;
+      const gameIsActive = gs && gs.current_card_index >= 0;
+      setDealerExists(dealerIsRecent || !!gameIsActive);
     };
     checkDealer();
     const poll = setInterval(checkDealer, 3000);
