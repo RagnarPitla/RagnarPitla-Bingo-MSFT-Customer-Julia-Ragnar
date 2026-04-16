@@ -153,16 +153,6 @@ const Index = () => {
         <div className={testMode ? "pt-8" : ""}>
           <SignInForm onSignIn={handleSignIn} loading={loading} onRestart={handleRestart} dealerExists={dealerExists} />
         </div>
-        <button
-          onClick={() => setTestMode(!testMode)}
-          className={`fixed bottom-8 left-1/2 -translate-x-1/2 px-6 py-3 rounded-full text-sm font-semibold border-2 z-50 transition-colors ${
-            testMode
-              ? "border-destructive bg-destructive/20 text-destructive hover:bg-destructive/30"
-              : "border-border bg-card text-muted-foreground hover:text-foreground hover:border-primary/50"
-          }`}
-        >
-          🧪 {testMode ? "Exit Test Mode" : "Test Mode"}
-        </button>
       </div>
     );
   }
