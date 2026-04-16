@@ -71,6 +71,10 @@ export function PokerTable({ participant, onRestart }: PokerTableProps) {
   useEffect(() => {
     fetchAll();
 
+    // Poll every 3 seconds so participants always see new joiners
+    // even if the realtime subscription misses an event
+    const poll = setInterval(fetchAll, 3000);
+
     const ch1 = supabase
       .channel("table-selections")
       .on("postgres_changes", { event: "*", schema: "public", table: "selections" }, fetchAll)
@@ -85,6 +89,7 @@ export function PokerTable({ participant, onRestart }: PokerTableProps) {
       .subscribe();
 
     return () => {
+      clearInterval(poll);
       supabase.removeChannel(ch1);
       supabase.removeChannel(ch2);
       supabase.removeChannel(ch3);

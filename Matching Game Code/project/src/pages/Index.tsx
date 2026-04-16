@@ -24,11 +24,12 @@ const Index = () => {
       setDealerExists((data?.length ?? 0) > 0);
     };
     checkDealer();
+    const poll = setInterval(checkDealer, 3000);
     const ch = supabase
       .channel("signin-participants")
       .on("postgres_changes", { event: "*", schema: "public", table: "participants" }, checkDealer)
       .subscribe();
-    return () => { supabase.removeChannel(ch); };
+    return () => { clearInterval(poll); supabase.removeChannel(ch); };
   }, []);
 
   const handleRestart = async () => {
