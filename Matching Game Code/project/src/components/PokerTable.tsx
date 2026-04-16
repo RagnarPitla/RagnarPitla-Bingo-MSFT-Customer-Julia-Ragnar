@@ -33,6 +33,7 @@ export function PokerTable({ participant, onRestart }: PokerTableProps) {
   const [gameStateId, setGameStateId] = useState<string | null>(null);
   const [showCard, setShowCard] = useState(false);
   const [viewingAgent, setViewingAgent] = useState<typeof agents[number] | null>(null);
+  const [showRestartConfirm, setShowRestartConfirm] = useState(false);
   const lastCardIndexRef = useRef(-2); // -2 = not yet initialised
   const broadcastChannelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
   const { toast } = useToast();
@@ -208,7 +209,7 @@ export function PokerTable({ participant, onRestart }: PokerTableProps) {
             📊 Export
           </button>
           <button
-            onClick={handleRestart}
+            onClick={() => setShowRestartConfirm(true)}
             className="text-xs px-4 py-1.5 rounded-full bg-destructive text-destructive-foreground font-medium hover:bg-destructive/90 transition-colors shadow-md"
           >
             🔄 Restart Game
@@ -290,6 +291,19 @@ export function PokerTable({ participant, onRestart }: PokerTableProps) {
         />
       )}
 
+      {/* How to Play */}
+      <div className="z-30 mt-4 w-full max-w-lg">
+        <div className="bg-black/40 border border-white/10 rounded-xl p-4 backdrop-blur-sm">
+          <h3 className="text-xs font-semibold uppercase tracking-wider text-primary mb-2">How to Play</h3>
+          <ol className="space-y-1 text-xs text-muted-foreground list-decimal list-inside">
+            <li>The dealer flips a card from the deck</li>
+            <li>The group discusses the details shown on the card</li>
+            <li>Each player selects or skips the card</li>
+            <li>Once all cards have been dealt, the dealer can flip any card again for further discussion</li>
+          </ol>
+        </div>
+      </div>
+
       {/* Played cards row — dealer only */}
       {isDealer && currentCardIndex >= 0 && (
         <div className="z-30 mt-4 flex flex-col items-center gap-2">
@@ -325,6 +339,32 @@ export function PokerTable({ participant, onRestart }: PokerTableProps) {
                 </button>
               );
             })}
+          </div>
+        </div>
+      )}
+      {/* Restart confirmation dialog */}
+      {showRestartConfirm && (
+        <div className="fixed inset-0 z-[70] flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/70" onClick={() => setShowRestartConfirm(false)} />
+          <div className="relative bg-card border border-border rounded-xl p-6 max-w-sm w-full mx-4 shadow-2xl">
+            <h3 className="text-lg font-semibold text-foreground mb-2">Restart Game?</h3>
+            <p className="text-sm text-muted-foreground mb-6">
+              This will clear all participants and selections and return all cards to the deck.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowRestartConfirm(false)}
+                className="flex-1 py-2.5 rounded-lg border border-border text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => { setShowRestartConfirm(false); handleRestart(); }}
+                className="flex-1 py-2.5 rounded-lg bg-destructive text-destructive-foreground text-sm font-semibold hover:bg-destructive/90 transition-colors"
+              >
+                Yes, Restart
+              </button>
+            </div>
           </div>
         </div>
       )}
