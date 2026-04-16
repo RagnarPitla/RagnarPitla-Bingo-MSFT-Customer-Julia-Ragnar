@@ -1,15 +1,27 @@
 {
   "navigationFallback": {
     "rewrite": "/index.html",
-    "exclude": ["/matching-game/*.{css,js,svg,png,jpg,jpeg,gif,ico,json,txt,woff,woff2}", "/matching-game/assets/*"]
+    "exclude": [
+      "/matching-game/assets/*",
+      "/matching-game/images/*",
+      "*.{css,js,svg,png,jpg,jpeg,gif,ico,json,txt,woff,woff2}"
+    ]
   },
   "routes": [
     {
-      "route": "/matching-game",
-      "rewrite": "/matching-game/index.html"
+      "route": "/matching-game/assets/*",
+      "headers": {
+        "Cache-Control": "public, max-age=31536000, immutable"
+      }
     },
     {
-      "route": "/matching-game/",
+      "route": "/matching-game/images/*",
+      "headers": {
+        "Cache-Control": "public, max-age=3600"
+      }
+    },
+    {
+      "route": "/matching-game*",
       "rewrite": "/matching-game/index.html"
     },
     {
