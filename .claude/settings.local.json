@@ -4,7 +4,9 @@
       "Skill(update-config)",
       "Skill(update-config:*)",
       "Read(//c/Users/jufitsim/.claude/**)",
-      "Bash(claude mcp:*)"
+      "Bash(claude mcp:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run:*)"
     ]
   }
 }

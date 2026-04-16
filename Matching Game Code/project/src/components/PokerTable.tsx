@@ -32,6 +32,7 @@ export function PokerTable({ participant, onRestart }: PokerTableProps) {
   const [currentCardIndex, setCurrentCardIndex] = useState(-1);
   const [gameStateId, setGameStateId] = useState<string | null>(null);
   const [showCard, setShowCard] = useState(false);
+  const [viewingAgent, setViewingAgent] = useState<typeof agents[number] | null>(null);
   const lastCardIndexRef = useRef(-2); // -2 = not yet initialised
   const { toast } = useToast();
 
@@ -165,25 +166,6 @@ export function PokerTable({ participant, onRestart }: PokerTableProps) {
           Playing as <span className="text-foreground font-medium">{participant.name}</span> · {participant.company}
         </p>
         <div className="flex items-center gap-3 mt-1">
-          {currentAgent && !showCard && (
-            <button
-              onClick={() => setShowCard(true)}
-              className="group relative w-14 h-20 md:w-16 md:h-22 rounded-md border-2 border-white/80 shadow-lg hover:scale-105 transition-transform overflow-hidden"
-              style={{
-                background: "linear-gradient(135deg, hsl(0, 70%, 45%), hsl(0, 60%, 30%))",
-                boxShadow: "0 4px 12px rgba(0,0,0,0.4), 0 0 8px hsl(300, 60%, 60%, 0.3)",
-              }}
-              title={`View: ${currentAgent.title}`}
-            >
-              <div className="absolute inset-[2px] rounded-sm border border-white/30" />
-              <div className="relative flex flex-col items-center justify-center h-full z-10 px-1">
-                <span className="text-[7px] md:text-[8px] font-bold text-white/90 leading-tight text-center font-['Space_Grotesk']">
-                  {currentAgent.title.split(" ").slice(0, 2).join(" ")}
-                </span>
-                <span className="text-[6px] text-white/60 mt-0.5">tap to view</span>
-              </div>
-            </button>
-          )}
           <button
             onClick={() => exportSelectionsToExcel(selections)}
             className="text-xs px-4 py-1.5 rounded-full bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-colors shadow-md"
@@ -258,6 +240,58 @@ export function PokerTable({ participant, onRestart }: PokerTableProps) {
             .filter((s) => s.agent_key === currentAgent.key)
             .map((s) => ({ name: s.name, company: s.company }))}
         />
+      )}
+
+      {/* Viewing a past card */}
+      {viewingAgent && !showCard && (
+        <RevealedCard
+          agent={viewingAgent}
+          isSelected={mySelections.includes(viewingAgent.key)}
+          onSelect={isDealer ? undefined : () => handleSelectCard(viewingAgent.key)}
+          onDismiss={() => setViewingAgent(null)}
+          selectedBy={selections
+            .filter((s) => s.agent_key === viewingAgent.key)
+            .map((s) => ({ name: s.name, company: s.company }))}
+        />
+      )}
+
+      {/* Played cards row */}
+      {currentCardIndex >= 0 && (
+        <div className="z-30 mt-4 flex flex-col items-center gap-2">
+          <p className="text-[10px] text-muted-foreground">Played Cards — tap to review</p>
+          <div className="flex gap-2 flex-wrap justify-center">
+            {agents.slice(0, currentCardIndex + 1).map((agent) => {
+              const selected = mySelections.includes(agent.key);
+              return (
+                <button
+                  key={agent.key}
+                  onClick={() => setViewingAgent(agent)}
+                  className="relative w-16 h-22 md:w-20 md:h-28 rounded-md border-2 shadow-lg hover:scale-110 transition-transform overflow-hidden"
+                  style={{
+                    background: selected
+                      ? "linear-gradient(135deg, hsl(300, 60%, 40%), hsl(300, 50%, 25%))"
+                      : "linear-gradient(135deg, hsl(0, 70%, 45%), hsl(0, 60%, 30%))",
+                    borderColor: selected ? "hsl(300, 60%, 60%)" : "rgba(255,255,255,0.8)",
+                    boxShadow: selected
+                      ? "0 0 12px hsl(300, 60%, 60%, 0.5)"
+                      : "0 4px 12px rgba(0,0,0,0.4)",
+                  }}
+                  title={agent.title}
+                >
+                  <div className="absolute inset-[2px] rounded-sm border border-white/30" />
+                  <div className="relative flex flex-col items-center justify-center h-full z-10 px-1">
+                    <span className="text-[7px] md:text-[8px] font-bold text-white/90 leading-tight text-center font-['Space_Grotesk']">
+                      {agent.title.replace(" Agent", "")}
+                    </span>
+                    {selected && (
+                      <span className="text-[6px] text-green-300 mt-0.5 font-semibold">✓ selected</span>
+                    )}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
       )}
     </div>
   );
