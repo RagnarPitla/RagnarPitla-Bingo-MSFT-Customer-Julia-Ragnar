@@ -1,14 +1,15 @@
 {
   "navigationFallback": {
     "rewrite": "/index.html",
-    "exclude": ["/matching-game/**"]
+    "exclude": ["/matching-game/*.{css,js,svg,png,jpg,jpeg,gif,ico,json,txt,woff,woff2}", "/matching-game/assets/*"]
   },
   "routes": [
     {
-      "route": "/matching-game/*",
-      "headers": {
-        "Cache-Control": "public, max-age=3600"
-      },
+      "route": "/matching-game",
+      "rewrite": "/matching-game/index.html"
+    },
+    {
+      "route": "/matching-game/",
       "rewrite": "/matching-game/index.html"
     },
     {
