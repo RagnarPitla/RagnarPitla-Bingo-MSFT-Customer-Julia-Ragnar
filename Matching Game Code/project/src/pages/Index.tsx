@@ -17,6 +17,18 @@ const Index = () => {
   const [testParticipants, setTestParticipants] = useState<Participant[]>([]);
   const [activeTestIndex, setActiveTestIndex] = useState(0);
 
+  const handleRestart = async () => {
+    const { data: gs } = await supabase.from("game_state").select("id").limit(1).single();
+    await Promise.all([
+      supabase.from("selections").delete().neq("id", "00000000-0000-0000-0000-000000000000"),
+      supabase.from("participants").delete().neq("id", "00000000-0000-0000-0000-000000000000"),
+      gs ? supabase.from("game_state").update({ current_card_index: -1 }).eq("id", gs.id) : Promise.resolve(),
+    ]);
+    setParticipant(null);
+    setTestMode(false);
+    setTestParticipants([]);
+  };
+
   const handleSignIn = async (name: string, company: string, role: "dealer" | "player") => {
     setLoading(true);
     const { data, error } = await supabase
@@ -95,7 +107,7 @@ const Index = () => {
 
         <div className="pt-8">
           {participant === null ? (
-            <SignInForm onSignIn={handleSignIn} loading={loading} />
+            <SignInForm onSignIn={handleSignIn} loading={loading} onRestart={handleRestart} />
           ) : (
             <PokerTable participant={active} onRestart={() => { setTestParticipants([]); setParticipant(null); setActiveTestIndex(0); }} />
           )}
@@ -113,7 +125,7 @@ const Index = () => {
           </div>
         )}
         <div className={testMode ? "pt-8" : ""}>
-          <SignInForm onSignIn={handleSignIn} loading={loading} />
+          <SignInForm onSignIn={handleSignIn} loading={loading} onRestart={handleRestart} />
         </div>
         <button
           onClick={() => setTestMode(!testMode)}

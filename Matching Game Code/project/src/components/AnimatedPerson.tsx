@@ -91,27 +91,32 @@ export function AnimatedPerson({
         {/* Shoulders / body top */}
         <path
           d="M8 52 C8 46, 16 42, 24 42 C32 42, 40 46, 40 52 L40 56 L8 56 Z"
-          fill={role === "dealer" ? "hsl(0, 70%, 40%)" : colors.shirt}
-          stroke={role === "dealer" ? "hsl(0, 70%, 50%)" : colors.shirt.replace(")", ", 0.8)").replace("hsl(", "hsl(")}
+          fill={role === "dealer" ? "hsl(0, 0%, 95%)" : colors.shirt}
+          stroke={role === "dealer" ? "hsl(0, 0%, 80%)" : colors.shirt.replace(")", ", 0.8)").replace("hsl(", "hsl(")}
           strokeWidth="0.5"
         />
+
+        {/* Dealer vest + bow tie */}
+        {role === "dealer" && (
+          <>
+            {/* Vest - left side */}
+            <path d="M8 52 C8 46, 16 42, 21 42 L21 56 L8 56 Z" fill="hsl(0, 0%, 10%)" />
+            {/* Vest - right side */}
+            <path d="M40 52 C40 46, 32 42, 27 42 L27 56 L40 56 Z" fill="hsl(0, 0%, 10%)" />
+            {/* Vest lapel edges */}
+            <line x1="21" y1="42" x2="22" y2="56" stroke="hsl(0, 0%, 20%)" strokeWidth="0.5" />
+            <line x1="27" y1="42" x2="26" y2="56" stroke="hsl(0, 0%, 20%)" strokeWidth="0.5" />
+            {/* Bow tie */}
+            <polygon points="20,44 24,46 20,48" fill="hsl(0, 70%, 40%)" />
+            <polygon points="28,44 24,46 28,48" fill="hsl(0, 70%, 40%)" />
+            <circle cx="24" cy="46" r="1.2" fill="hsl(0, 70%, 35%)" />
+          </>
+        )}
 
         {/* Head shape */}
         <ellipse cx="24" cy="22" rx="14" ry="17" fill={colors.skin} />
         
-        {/* Dealer top hat */}
-        {role === "dealer" && (
-          <>
-            {/* Hat brim */}
-            <ellipse cx="24" cy="5" rx="18" ry="3" fill="hsl(0, 0%, 10%)" stroke="hsl(40, 70%, 50%)" strokeWidth="0.8" />
-            {/* Hat crown */}
-            <rect x="12" y="-14" width="24" height="19" rx="2" fill="hsl(0, 0%, 12%)" stroke="hsl(40, 70%, 50%)" strokeWidth="0.5" />
-            {/* Hat band */}
-            <rect x="12" y="0" width="24" height="3" fill="hsl(40, 70%, 50%)" />
-            {/* Band buckle */}
-            <rect x="21" y="-0.5" width="6" height="4" rx="0.5" fill="none" stroke="hsl(45, 80%, 65%)" strokeWidth="0.8" />
-          </>
-        )}
+
 
         {/* Hair - gender neutral short style */}
         <path

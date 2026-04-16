@@ -5,9 +5,10 @@ import { Input } from "@/components/ui/input";
 interface SignInFormProps {
   onSignIn: (name: string, company: string, role: "dealer" | "player") => void;
   loading: boolean;
+  onRestart?: () => void;
 }
 
-export function SignInForm({ onSignIn, loading }: SignInFormProps) {
+export function SignInForm({ onSignIn, loading, onRestart }: SignInFormProps) {
   const [name, setName] = useState("");
   const [company, setCompany] = useState("");
   const [role, setRole] = useState<"dealer" | "player">("player");
@@ -95,6 +96,7 @@ export function SignInForm({ onSignIn, loading }: SignInFormProps) {
             {loading ? "Joining..." : role === "dealer" ? "Join as Dealer" : "Join the Game"}
           </Button>
         </form>
+
       </div>
     </div>
   );

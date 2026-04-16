@@ -158,27 +158,34 @@ export function PokerTable({ participant, onRestart }: PokerTableProps) {
           {currentAgent && !showCard && (
             <button
               onClick={() => setShowCard(true)}
-              className="text-[10px] text-primary underline underline-offset-2 hover:text-primary/80"
+              className="group relative w-14 h-20 md:w-16 md:h-22 rounded-md border-2 border-white/80 shadow-lg hover:scale-105 transition-transform overflow-hidden"
+              style={{
+                background: "linear-gradient(135deg, hsl(0, 70%, 45%), hsl(0, 60%, 30%))",
+                boxShadow: "0 4px 12px rgba(0,0,0,0.4), 0 0 8px hsl(300, 60%, 60%, 0.3)",
+              }}
+              title={`View: ${currentAgent.title}`}
             >
-              View current card: {currentAgent.title}
+              <div className="absolute inset-[2px] rounded-sm border border-white/30" />
+              <div className="relative flex flex-col items-center justify-center h-full z-10 px-1">
+                <span className="text-[7px] md:text-[8px] font-bold text-white/90 leading-tight text-center font-['Space_Grotesk']">
+                  {currentAgent.title.split(" ").slice(0, 2).join(" ")}
+                </span>
+                <span className="text-[6px] text-white/60 mt-0.5">tap to view</span>
+              </div>
             </button>
           )}
-          {isDealer && allDealt && (
-            <button
-              onClick={() => exportSelectionsToExcel(selections)}
-              className="text-[10px] px-3 py-1 rounded-full border border-primary/50 text-primary hover:bg-primary/10 transition-colors"
-            >
-              📊 Export
-            </button>
-          )}
-          {isDealer && (
-            <button
-              onClick={handleRestart}
-              className="text-[10px] px-3 py-1 rounded-full border border-destructive/50 text-destructive hover:bg-destructive/10 transition-colors"
-            >
-              🔄 Restart Game
-            </button>
-          )}
+          <button
+            onClick={() => exportSelectionsToExcel(selections)}
+            className="text-xs px-4 py-1.5 rounded-full bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-colors shadow-md"
+          >
+            📊 Export
+          </button>
+          <button
+            onClick={handleRestart}
+            className="text-xs px-4 py-1.5 rounded-full bg-destructive text-destructive-foreground font-medium hover:bg-destructive/90 transition-colors shadow-md"
+          >
+            🔄 Restart Game
+          </button>
         </div>
       </div>
 
@@ -214,7 +221,7 @@ export function PokerTable({ participant, onRestart }: PokerTableProps) {
         <CardDeck currentCardIndex={currentCardIndex} onFlipNext={handleFlipNext} canFlip={isDealer} />
 
         {/* People around the table */}
-        {participants.map((p, i) => (
+        {[...participants].sort((a, b) => (a.role === "dealer" ? -1 : b.role === "dealer" ? 1 : 0)).map((p, i) => (
           <AnimatedPerson
             key={p.id}
             name={p.name}
