@@ -34,6 +34,7 @@ export function PokerTable({ participant, onRestart }: PokerTableProps) {
   const [showCard, setShowCard] = useState(false);
   const [viewingAgent, setViewingAgent] = useState<typeof agents[number] | null>(null);
   const lastCardIndexRef = useRef(-2); // -2 = not yet initialised
+  const broadcastChannelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
   const { toast } = useToast();
 
   const isDealer = participant.role === "dealer";
@@ -89,11 +90,27 @@ export function PokerTable({ participant, onRestart }: PokerTableProps) {
       .on("postgres_changes", { event: "*", schema: "public", table: "game_state" }, fetchAll)
       .subscribe();
 
+    // Broadcast channel — dealer opens/closes past cards for everyone
+    const broadcastCh = supabase
+      .channel("game-review-broadcast")
+      .on("broadcast", { event: "review-card" }, ({ payload }) => {
+        if (!isDealer) {
+          const agent = agents.find(a => a.key === payload.agentKey);
+          if (agent) setViewingAgent(agent);
+        }
+      })
+      .on("broadcast", { event: "close-review" }, () => {
+        setViewingAgent(null);
+      })
+      .subscribe();
+    broadcastChannelRef.current = broadcastCh;
+
     return () => {
       clearInterval(poll);
       supabase.removeChannel(ch1);
       supabase.removeChannel(ch2);
       supabase.removeChannel(ch3);
+      supabase.removeChannel(broadcastCh);
     };
   }, [participant.id]);
 
@@ -139,6 +156,24 @@ export function PokerTable({ participant, onRestart }: PokerTableProps) {
     setShowCard(false);
     toast({ title: "Game restarted!", description: "All users cleared and cards returned to the deck." });
     onRestart?.();
+  };
+
+  const handleDealerReviewCard = async (agent: typeof agents[number]) => {
+    setViewingAgent(agent);
+    await broadcastChannelRef.current?.send({
+      type: "broadcast",
+      event: "review-card",
+      payload: { agentKey: agent.key },
+    });
+  };
+
+  const handleCloseReview = async () => {
+    setViewingAgent(null);
+    await broadcastChannelRef.current?.send({
+      type: "broadcast",
+      event: "close-review",
+      payload: {},
+    });
   };
 
   const cardTitles = Object.fromEntries(agents.map((a) => [a.key, a.title]));
@@ -242,13 +277,13 @@ export function PokerTable({ participant, onRestart }: PokerTableProps) {
         />
       )}
 
-      {/* Viewing a past card */}
+      {/* Viewing a past card — broadcast by dealer, visible to all */}
       {viewingAgent && !showCard && (
         <RevealedCard
           agent={viewingAgent}
           isSelected={mySelections.includes(viewingAgent.key)}
           onSelect={isDealer ? undefined : () => handleSelectCard(viewingAgent.key)}
-          onDismiss={() => setViewingAgent(null)}
+          onDismiss={isDealer ? handleCloseReview : () => setViewingAgent(null)}
           selectedBy={selections
             .filter((s) => s.agent_key === viewingAgent.key)
             .map((s) => ({ name: s.name, company: s.company }))}
@@ -265,7 +300,7 @@ export function PokerTable({ participant, onRestart }: PokerTableProps) {
               return (
                 <button
                   key={agent.key}
-                  onClick={() => setViewingAgent(agent)}
+                  onClick={() => handleDealerReviewCard(agent)}
                   className="relative w-16 h-22 md:w-20 md:h-28 rounded-md border-2 shadow-lg hover:scale-110 transition-transform overflow-hidden"
                   style={{
                     background: selected
