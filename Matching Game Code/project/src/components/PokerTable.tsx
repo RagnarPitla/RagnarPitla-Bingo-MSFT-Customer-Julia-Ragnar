@@ -255,10 +255,10 @@ export function PokerTable({ participant, onRestart }: PokerTableProps) {
         />
       )}
 
-      {/* Played cards row */}
-      {currentCardIndex >= 0 && (
+      {/* Played cards row — dealer only */}
+      {isDealer && currentCardIndex >= 0 && (
         <div className="z-30 mt-4 flex flex-col items-center gap-2">
-          <p className="text-[10px] text-muted-foreground">Played Cards — tap to review</p>
+          <p className="text-[10px] text-muted-foreground">Played Cards — tap to flip again</p>
           <div className="flex gap-2 flex-wrap justify-center">
             {agents.slice(0, currentCardIndex + 1).map((agent) => {
               const selected = mySelections.includes(agent.key);
