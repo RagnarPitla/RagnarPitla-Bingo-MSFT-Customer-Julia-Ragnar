@@ -20,6 +20,27 @@ jobs:
           submodules: true
           lfs: false
 
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Matching Game dependencies
+        working-directory: "Matching Game Code/project"
+        run: npm ci
+
+      - name: Build Matching Game
+        working-directory: "Matching Game Code/project"
+        run: npm run build
+
+      - name: Assemble dist
+        run: |
+          mkdir -p dist/matching-game
+          cp index.html dist/
+          cp staticwebapp.config.json dist/
+          cp "D logo.png" dist/ || true
+          cp -r "Matching Game Code/project/dist/"* dist/matching-game/
+
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
@@ -27,10 +48,10 @@ jobs:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "upload"
-          app_location: "/" # App source code path
-          api_location: "" # Api source code path - optional
-          output_location: "" # Built app content directory - optional
-          skip_app_build: true # Static HTML, no build needed
+          app_location: "/dist"
+          api_location: ""
+          output_location: ""
+          skip_app_build: true
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
