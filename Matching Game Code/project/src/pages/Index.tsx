@@ -52,6 +52,7 @@ const Index = () => {
     setParticipant(null);
     setTestMode(false);
     setTestParticipants([]);
+    setDealerExists(false);
   };
 
   const handleSignIn = async (name: string, company: string, role: "dealer" | "player") => {
