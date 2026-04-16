@@ -32,6 +32,9 @@ jobs:
 
       - name: Build Matching Game
         working-directory: "Matching Game Code/project"
+        env:
+          VITE_SUPABASE_URL: https://dpexwkowhohdbewmsyno.supabase.co
+          VITE_SUPABASE_PUBLISHABLE_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRwZXh3a293aG9oZGJld21zeW5vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyNTc0NjksImV4cCI6MjA5MTgzMzQ2OX0.cnVo3zGCWBydS2xe4Vk8RbYfqDRnApLuj5YwZZPNZ-s
         run: npm run build
 
       - name: Assemble dist
