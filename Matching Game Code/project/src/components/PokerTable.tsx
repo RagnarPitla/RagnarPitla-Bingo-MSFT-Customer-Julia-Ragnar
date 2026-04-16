@@ -242,6 +242,7 @@ export function PokerTable({ participant, onRestart }: PokerTableProps) {
           agent={currentAgent}
           isSelected={mySelections.includes(currentAgent.key)}
           onSelect={isDealer ? undefined : () => handleSelectCard(currentAgent.key)}
+          onSkip={isDealer ? undefined : () => setShowCard(false)}
           onDismiss={isDealer ? () => setShowCard(false) : undefined}
           selectedBy={selections
             .filter((s) => s.agent_key === currentAgent.key)

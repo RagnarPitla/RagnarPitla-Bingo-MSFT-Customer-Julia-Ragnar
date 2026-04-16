@@ -5,11 +5,12 @@ interface RevealedCardProps {
   agent: Agent;
   isSelected: boolean;
   onSelect?: () => void;
+  onSkip?: () => void;
   onDismiss?: () => void;
   selectedBy: { name: string; company: string }[];
 }
 
-export function RevealedCard({ agent, isSelected, onSelect, onDismiss, selectedBy }: RevealedCardProps) {
+export function RevealedCard({ agent, isSelected, onSelect, onSkip, onDismiss, selectedBy }: RevealedCardProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
       {/* Backdrop - subtle so the table is still visible */}
@@ -92,23 +93,50 @@ export function RevealedCard({ agent, isSelected, onSelect, onDismiss, selectedB
           </div>
         )}
 
-        {/* Select button - only for players */}
+        {/* Select / Skip buttons - only for players */}
         {onSelect ? (
-          <button
-            onClick={onSelect}
-            className="w-full py-2.5 rounded-lg text-sm font-semibold transition-all"
-            style={{
-              background: isSelected
-                ? "linear-gradient(135deg, hsl(160, 60%, 45%), hsl(160, 40%, 35%))"
-                : "linear-gradient(135deg, hsl(300, 60%, 60%), hsl(300, 40%, 45%))",
-              color: "hsl(222, 47%, 8%)",
-              boxShadow: isSelected
-                ? "0 4px 15px hsl(160, 60%, 45%, 0.3)"
-                : "0 4px 15px hsl(300, 60%, 60%, 0.3)",
-            }}
-          >
-            {isSelected ? "✓ Selected — Tap to Deselect" : "Select This Agent"}
-          </button>
+          isSelected ? (
+            <div className="space-y-2">
+              <div
+                className="w-full py-2.5 rounded-lg text-sm font-semibold text-center"
+                style={{
+                  background: "linear-gradient(135deg, hsl(160, 60%, 45%), hsl(160, 40%, 35%))",
+                  color: "hsl(222, 47%, 8%)",
+                  boxShadow: "0 4px 15px hsl(160, 60%, 45%, 0.3)",
+                }}
+              >
+                ✓ Added to your pile
+              </div>
+              <button
+                onClick={onSelect}
+                className="w-full py-1.5 rounded-lg text-xs text-muted-foreground border border-border hover:text-foreground hover:border-primary/50 transition-all"
+                style={{ background: "hsl(222, 40%, 12%)" }}
+              >
+                Deselect
+              </button>
+            </div>
+          ) : (
+            <div className="flex gap-2">
+              <button
+                onClick={onSelect}
+                className="flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all"
+                style={{
+                  background: "linear-gradient(135deg, hsl(300, 60%, 60%), hsl(300, 40%, 45%))",
+                  color: "hsl(222, 47%, 8%)",
+                  boxShadow: "0 4px 15px hsl(300, 60%, 60%, 0.3)",
+                }}
+              >
+                Select this Agent
+              </button>
+              <button
+                onClick={onSkip}
+                className="flex-1 py-2.5 rounded-lg text-sm font-semibold border border-border text-muted-foreground hover:text-foreground hover:border-primary/50 transition-all"
+                style={{ background: "hsl(222, 40%, 12%)" }}
+              >
+                Skip
+              </button>
+            </div>
+          )
         ) : (
           <div className="space-y-2">
             <p className="text-center text-xs text-muted-foreground">
