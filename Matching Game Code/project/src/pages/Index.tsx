@@ -17,6 +17,7 @@ const Index = () => {
   const [testParticipants, setTestParticipants] = useState<Participant[]>([]);
   const [activeTestIndex, setActiveTestIndex] = useState(0);
   const [dealerExists, setDealerExists] = useState(false);
+  const [signInError, setSignInError] = useState<string | null>(null);
 
   useEffect(() => {
     const checkDealer = async () => {
@@ -57,31 +58,28 @@ const Index = () => {
 
   const handleSignIn = async (name: string, company: string, role: "dealer" | "player") => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from("participants")
-      .insert({ name, company, role })
-      .select()
-      .single();
+    setSignInError(null);
+    try {
+      const timeout = new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error("Could not reach the game server. The server may be waking up — please try again in a few seconds.")), 8000)
+      );
+      const { data, error } = await Promise.race([
+        supabase.from("participants").insert({ name, company, role }).select().single(),
+        timeout,
+      ]);
 
-    if (error) {
-      console.error(error);
+      if (error) {
+        setSignInError(error.message);
+        return;
+      }
+
+      const p = { id: data.id, name: data.name, company: data.company, role: (data.role as "dealer" | "player") };
+      setParticipant(p);
+    } catch (err: any) {
+      setSignInError(err.message ?? "Connection error — please try again.");
+    } finally {
       setLoading(false);
-      return;
     }
-
-    const p = { id: data.id, name: data.name, company: data.company, role: (data.role as "dealer" | "player") };
-
-    if (testMode) {
-      setTestParticipants((prev) => {
-        const updated = [...prev, p];
-        setActiveTestIndex(updated.length - 1);
-        return updated;
-      });
-      setParticipant(p);
-    } else {
-      setParticipant(p);
-    }
-    setLoading(false);
   };
 
   // Test mode: show sign-in for adding more users + switcher
@@ -133,7 +131,7 @@ const Index = () => {
 
         <div className="pt-8">
           {participant === null ? (
-            <SignInForm onSignIn={handleSignIn} loading={loading} onRestart={handleRestart} dealerExists={dealerExists} />
+            <SignInForm onSignIn={handleSignIn} loading={loading} onRestart={handleRestart} dealerExists={dealerExists} error={signInError} />
           ) : (
             <PokerTable participant={active} onRestart={() => { setTestParticipants([]); setParticipant(null); setActiveTestIndex(0); }} />
           )}
@@ -151,7 +149,7 @@ const Index = () => {
           </div>
         )}
         <div className={testMode ? "pt-8" : ""}>
-          <SignInForm onSignIn={handleSignIn} loading={loading} onRestart={handleRestart} dealerExists={dealerExists} />
+          <SignInForm onSignIn={handleSignIn} loading={loading} onRestart={handleRestart} dealerExists={dealerExists} error={signInError} />
         </div>
       </div>
     );

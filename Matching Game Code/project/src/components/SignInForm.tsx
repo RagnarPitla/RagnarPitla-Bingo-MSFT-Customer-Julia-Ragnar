@@ -7,9 +7,10 @@ interface SignInFormProps {
   loading: boolean;
   onRestart?: () => void;
   dealerExists?: boolean;
+  error?: string | null;
 }
 
-export function SignInForm({ onSignIn, loading, onRestart, dealerExists }: SignInFormProps) {
+export function SignInForm({ onSignIn, loading, onRestart, dealerExists, error }: SignInFormProps) {
   const [name, setName] = useState("");
   const [company, setCompany] = useState("");
   const [role, setRole] = useState<"dealer" | "player">("player");
@@ -99,6 +100,12 @@ export function SignInForm({ onSignIn, loading, onRestart, dealerExists }: SignI
           <Button type="submit" className="w-full" disabled={loading || !name.trim() || !company.trim()}>
             {loading ? "Joining..." : role === "dealer" ? "Join as Dealer" : "Join the Game"}
           </Button>
+
+          {error && (
+            <p className="text-xs text-destructive text-center pt-1">
+              {error}
+            </p>
+          )}
         </form>
 
       </div>
