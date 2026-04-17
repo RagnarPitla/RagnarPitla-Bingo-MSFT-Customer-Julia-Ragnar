@@ -1,0 +1,19 @@
+name: Keep Supabase Alive
+
+on:
+  schedule:
+    - cron: '0 8 * * *'   # Every day at 8am UTC
+  workflow_dispatch:        # Also allow manual trigger
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase to prevent auto-pause
+        run: |
+          curl -sf \
+            "https://dpexwkowhohdbewmsyno.supabase.co/rest/v1/game_state?select=id&limit=1" \
+            -H "apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRwZXh3a293aG9oZGJld21zeW5vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyNTc0NjksImV4cCI6MjA5MTgzMzQ2OX0.cnVo3zGCWBydS2xe4Vk8RbYfqDRnApLuj5YwZZPNZ-s" \
+            -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRwZXh3a293aG9oZGJld21zeW5vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyNTc0NjksImV4cCI6MjA5MTgzMzQ2OX0.cnVo3zGCWBydS2xe4Vk8RbYfqDRnApLuj5YwZZPNZ-s" \
+            && echo "Supabase ping successful" \
+            || echo "Ping failed — project may be paused"
