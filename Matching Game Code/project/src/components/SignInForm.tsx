@@ -27,7 +27,7 @@ export function SignInForm({ onSignIn, loading, onRestart, dealerExists, error }
     <div
       className="min-h-screen flex items-center justify-center p-4 relative"
       style={{
-        backgroundImage: `url('${import.meta.env.BASE_URL}images/dating game background.png')`,
+        backgroundImage: `url('${import.meta.env.BASE_URL}images/dating-game-background.png')`,
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",

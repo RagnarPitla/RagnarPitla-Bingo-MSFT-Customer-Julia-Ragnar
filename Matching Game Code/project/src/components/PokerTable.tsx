@@ -190,7 +190,7 @@ export function PokerTable({ participant, onRestart }: PokerTableProps) {
     <div
       className="min-h-screen flex flex-col items-center justify-center p-4 overflow-hidden relative"
       style={{
-        backgroundImage: `url('${import.meta.env.BASE_URL}images/dating game background.png')`,
+        backgroundImage: `url('${import.meta.env.BASE_URL}images/dating-game-background.png')`,
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
