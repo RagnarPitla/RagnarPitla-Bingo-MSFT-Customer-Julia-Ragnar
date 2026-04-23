@@ -1,0 +1,8 @@
+{
+  "name": "champions-games-api",
+  "version": "1.0.0",
+  "description": "Azure Functions API for Champions Games",
+  "dependencies": {
+    "@azure/data-tables": "^13.3.0"
+  }
+}

@@ -1,13 +1,12 @@
 import { useState, useEffect, useRef } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import * as gameApi from "@/lib/gameApi";
+import { getAgentColor } from "@/data/agentColors";
 import { agents } from "@/data/agents";
 import { AnimatedPerson } from "@/components/AnimatedPerson";
 import { CardDeck } from "@/components/CardDeck";
 import { RevealedCard } from "@/components/RevealedCard";
 import { useToast } from "@/hooks/use-toast";
 import { exportSelectionsToExcel } from "@/utils/exportSelections";
-import { getAgentColor } from "@/data/agentColors";
-import { DynamicsSign } from "@/components/DynamicsSign";
 
 interface Participant {
   id: string;
@@ -32,12 +31,12 @@ export function PokerTable({ participant, onRestart }: PokerTableProps) {
   const [participants, setParticipants] = useState<Participant[]>([]);
   const [selections, setSelections] = useState<SelectionWithInfo[]>([]);
   const [currentCardIndex, setCurrentCardIndex] = useState(-1);
-  const [gameStateId, setGameStateId] = useState<string | null>(null);
+  const [gameStateId] = useState("state");
   const [showCard, setShowCard] = useState(false);
   const [viewingAgent, setViewingAgent] = useState<typeof agents[number] | null>(null);
   const [showRestartConfirm, setShowRestartConfirm] = useState(false);
-  const lastCardIndexRef = useRef(-2); // -2 = not yet initialised
-  const broadcastChannelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
+  const lastCardIndexRef = useRef(-2);
+  const lastReviewingKeyRef = useRef<string | null | undefined>(undefined);
   const { toast } = useToast();
 
   const isDealer = participant.role === "dealer";
@@ -46,167 +45,127 @@ export function PokerTable({ participant, onRestart }: PokerTableProps) {
   const allDealt = currentCardIndex >= agents.length - 1;
 
   const fetchAll = async () => {
-    const [{ data: parts }, { data: sels }, { data: gs }] = await Promise.all([
-      supabase.from("participants").select("id, name, company, role"),
-      supabase.from("selections").select("participant_id, agent_key"),
-      supabase.from("game_state").select("*").limit(1).single(),
-    ]);
+    try {
+      const [parts, sels, gs] = await Promise.all([
+        gameApi.participants.list(),
+        gameApi.selections.list(),
+        gameApi.gameState.get(),
+      ]);
 
-    if (parts) setParticipants(parts.map(p => ({ ...p, role: p.role as "dealer" | "player" })));
-    if (gs) {
-      const prevIndex = lastCardIndexRef.current;
+      setParticipants(parts.map(p => ({ ...p, role: p.role as "dealer" | "player" })));
+
       const newIndex = gs.current_card_index;
-      // Only show card overlay when the index actually advances (not on initial load)
+      const prevIndex = lastCardIndexRef.current;
       if (prevIndex !== -2 && newIndex !== prevIndex && newIndex >= 0) {
         setShowCard(true);
       }
       lastCardIndexRef.current = newIndex;
       setCurrentCardIndex(newIndex);
-      setGameStateId(gs.id);
-    }
-    if (sels && parts) {
+
+      // Reviewing card key — broadcast replacement via polled game state
+      const newReviewingKey = gs.reviewing_card_key || null;
+      const prevReviewingKey = lastReviewingKeyRef.current;
+      if (!isDealer && prevReviewingKey !== undefined && newReviewingKey !== prevReviewingKey) {
+        if (newReviewingKey) {
+          const agent = agents.find(a => a.key === newReviewingKey);
+          if (agent) setViewingAgent(agent);
+        } else {
+          setViewingAgent(null);
+        }
+      }
+      lastReviewingKeyRef.current = newReviewingKey;
+
       const enriched = sels.map((s) => {
         const p = parts.find((p) => p.id === s.participant_id);
         return { ...s, name: p?.name ?? "Unknown", company: p?.company ?? "" };
       });
       setSelections(enriched);
+    } catch (err) {
+      console.error("fetchAll error:", err);
     }
   };
 
   useEffect(() => {
     fetchAll();
-
-    // Poll every 3 seconds so participants always see new joiners
-    // even if the realtime subscription misses an event
     const poll = setInterval(fetchAll, 3000);
-
-    const ch1 = supabase
-      .channel("table-selections")
-      .on("postgres_changes", { event: "*", schema: "public", table: "selections" }, fetchAll)
-      .subscribe();
-    const ch2 = supabase
-      .channel("table-participants")
-      .on("postgres_changes", { event: "*", schema: "public", table: "participants" }, fetchAll)
-      .subscribe();
-    const ch3 = supabase
-      .channel("table-gamestate")
-      .on("postgres_changes", { event: "*", schema: "public", table: "game_state" }, fetchAll)
-      .subscribe();
-
-    // Broadcast channel — dealer opens/closes past cards for everyone
-    const broadcastCh = supabase
-      .channel("game-review-broadcast")
-      .on("broadcast", { event: "review-card" }, ({ payload }) => {
-        if (!isDealer) {
-          const agent = agents.find(a => a.key === payload.agentKey);
-          if (agent) setViewingAgent(agent);
-        }
-      })
-      .on("broadcast", { event: "close-review" }, () => {
-        setViewingAgent(null);
-      })
-      .subscribe();
-    broadcastChannelRef.current = broadcastCh;
-
-    return () => {
-      clearInterval(poll);
-      supabase.removeChannel(ch1);
-      supabase.removeChannel(ch2);
-      supabase.removeChannel(ch3);
-      supabase.removeChannel(broadcastCh);
-    };
+    return () => clearInterval(poll);
   }, [participant.id]);
 
   const handleFlipNext = async () => {
-    if (!gameStateId) return;
     const next = currentCardIndex + 1;
     if (next >= agents.length) return;
-    await supabase.from("game_state").update({ current_card_index: next }).eq("id", gameStateId);
+    await gameApi.gameState.update({ current_card_index: next });
     setCurrentCardIndex(next);
     setShowCard(true);
   };
 
   const handleSelectCard = async (agentKey: string) => {
     const alreadySelected = mySelections.includes(agentKey);
-
     if (alreadySelected) {
-      await supabase
-        .from("selections")
-        .delete()
-        .eq("participant_id", participant.id)
-        .eq("agent_key", agentKey);
+      await gameApi.selections.delete(participant.id, agentKey);
       toast({ title: "Card deselected" });
       return;
     }
-
-    await supabase
-      .from("selections")
-      .insert({ participant_id: participant.id, agent_key: agentKey });
-
+    await gameApi.selections.create({ participant_id: participant.id, agent_key: agentKey });
     const agent = agents.find((a) => a.key === agentKey);
     toast({ title: "Card selected!", description: `You chose: ${agent?.title}` });
     setShowCard(false);
   };
 
   const handleRestart = async () => {
-    if (gameStateId) {
-      await Promise.all([
-        supabase.from("selections").delete().neq("id", "00000000-0000-0000-0000-000000000000"),
-        supabase.from("participants").delete().neq("id", "00000000-0000-0000-0000-000000000000"),
-        supabase.from("game_state").update({ current_card_index: -1 }).eq("id", gameStateId),
-      ]);
-    }
+    await gameApi.resetGame();
     setShowCard(false);
+    setViewingAgent(null);
+    lastCardIndexRef.current = -2;
+    lastReviewingKeyRef.current = undefined;
     toast({ title: "Game restarted!", description: "All users cleared and cards returned to the deck." });
     onRestart?.();
   };
 
   const handleDealerReviewCard = async (agent: typeof agents[number]) => {
     setViewingAgent(agent);
-    await broadcastChannelRef.current?.send({
-      type: "broadcast",
-      event: "review-card",
-      payload: { agentKey: agent.key },
-    });
+    await gameApi.gameState.update({ reviewing_card_key: agent.key });
   };
 
   const handleCloseReview = async () => {
     setViewingAgent(null);
-    await broadcastChannelRef.current?.send({
-      type: "broadcast",
-      event: "close-review",
-      payload: {},
-    });
+    await gameApi.gameState.update({ reviewing_card_key: null });
   };
 
   const cardTitles = Object.fromEntries(agents.map((a) => [a.key, a.title]));
-  const dealerParticipant = participants.find((p) => p.role === "dealer") ?? null;
-  const players = participants.filter((p) => p.role === "player");
-  const totalPeople = (dealerParticipant ? 1 : 0) + players.length;
-  const personScale = totalPeople <= 5 ? 1 : totalPeople <= 8 ? 0.85 : 0.72;
-  const stageGap = totalPeople <= 5 ? "gap-6" : totalPeople <= 8 ? "gap-4" : "gap-3";
+
+  const selectionsForExport = selections.map(s => ({
+    participant_id: s.participant_id,
+    agent_key: s.agent_key,
+    name: s.name,
+    company: s.company,
+  }));
 
   return (
     <div
       className="min-h-screen flex flex-col items-center justify-center p-4 overflow-hidden relative"
       style={{
-        backgroundImage: `url('${import.meta.env.BASE_URL}images/dating-game-background.png')`,
+        backgroundImage: `url('${import.meta.env.BASE_URL}images/casino-bg.png')`,
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
       }}
     >
-      {/* Dark overlay to mute background */}
       <div className="absolute inset-0 bg-black/60 pointer-events-none" />
+
       {/* Header */}
       <div className="text-center mb-4 z-30">
-        <DynamicsSign className="mx-auto mb-1" />
+        <img
+          src={`${import.meta.env.BASE_URL}images/casino-sign.png`}
+          alt="Dynamics Agents"
+          className="mx-auto h-36 md:h-48 w-auto drop-shadow-2xl animate-sign-glow"
+        />
         <p className="text-[10px] md:text-xs text-muted-foreground">
           Playing as <span className="text-foreground font-medium">{participant.name}</span> · {participant.company}
         </p>
         <div className="flex items-center gap-3 mt-1">
           <button
-            onClick={() => exportSelectionsToExcel(selections)}
+            onClick={() => exportSelectionsToExcel(selectionsForExport)}
             className="text-xs px-4 py-1.5 rounded-full bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-colors shadow-md"
           >
             📊 Export
@@ -220,55 +179,44 @@ export function PokerTable({ participant, onRestart }: PokerTableProps) {
         </div>
       </div>
 
-      {/* Stage */}
-      <div className="relative w-full z-20">
-        {/* Stage floor */}
+      {/* Table */}
+      <div className="relative w-full max-w-3xl aspect-square md:aspect-[4/3]">
         <div
-          className="absolute bottom-0 left-0 right-0 h-14"
+          className="absolute inset-[8%] rounded-[50%] border-4"
           style={{
-            background: "linear-gradient(to bottom, hsl(0,0%,14%), hsl(0,0%,9%))",
-            borderTop: "2px solid hsl(0,0%,28%)",
-            boxShadow: "0 -6px 24px rgba(0,0,0,0.6)",
+            background: "radial-gradient(ellipse at center, hsl(120, 50%, 30%), hsl(120, 45%, 22%), hsl(120, 40%, 14%))",
+            borderColor: "hsl(30, 50%, 25%)",
+            boxShadow: "inset 0 0 60px hsl(150, 30%, 8%), 0 0 40px hsl(0, 0%, 0%, 0.5), 0 10px 30px hsl(0, 0%, 0%, 0.3)",
           }}
-        />
-        {/* Characters + deck row */}
-        <div className={`relative flex flex-row items-end ${stageGap} px-6 md:px-10 pb-12 overflow-x-auto`}>
-          {/* Dealer — far left */}
-          {dealerParticipant && (
-            <AnimatedPerson
-              key={dealerParticipant.id}
-              name={dealerParticipant.name}
-              company={dealerParticipant.company}
-              index={0}
-              isCurrentUser={dealerParticipant.id === participant.id}
-              selectedCards={selections.filter((s) => s.participant_id === dealerParticipant.id).map((s) => s.agent_key)}
-              cardTitles={cardTitles}
-              role="dealer"
-              scale={personScale}
-            />
-          )}
-          {/* Card deck */}
-          <div className="flex-shrink-0 pb-2 flex flex-col items-center">
-            <CardDeck currentCardIndex={currentCardIndex} onFlipNext={handleFlipNext} canFlip={isDealer} />
-          </div>
-          {/* Players */}
-          {players.map((p, i) => (
-            <AnimatedPerson
-              key={p.id}
-              name={p.name}
-              company={p.company}
-              index={i + 1}
-              isCurrentUser={p.id === participant.id}
-              selectedCards={selections.filter((s) => s.participant_id === p.id).map((s) => s.agent_key)}
-              cardTitles={cardTitles}
-              role="player"
-              scale={personScale}
-            />
-          ))}
+        >
+          <div
+            className="absolute inset-0 rounded-[50%] opacity-10"
+            style={{
+              backgroundImage: "repeating-linear-gradient(45deg, transparent, transparent 10px, hsl(150, 40%, 30%) 10px, hsl(150, 40%, 30%) 11px)",
+            }}
+          />
         </div>
+        <div
+          className="absolute inset-[6%] rounded-[50%] border-8 pointer-events-none"
+          style={{ borderColor: "hsl(30, 40%, 20%)", boxShadow: "inset 0 2px 8px hsl(30, 50%, 30%, 0.3)" }}
+        />
+        <CardDeck currentCardIndex={currentCardIndex} onFlipNext={handleFlipNext} canFlip={isDealer} />
+        {[...participants].sort((a, b) => (a.role === "dealer" ? -1 : b.role === "dealer" ? 1 : 0)).map((p, i) => (
+          <AnimatedPerson
+            key={p.id}
+            name={p.name}
+            company={p.company}
+            index={i}
+            total={participants.length}
+            isCurrentUser={p.id === participant.id}
+            selectedCards={selections.filter((s) => s.participant_id === p.id).map((s) => s.agent_key)}
+            cardTitles={cardTitles}
+            role={p.role}
+          />
+        ))}
       </div>
 
-      {/* Revealed card overlay */}
+      {/* Current card overlay */}
       {showCard && currentAgent && (
         <RevealedCard
           agent={currentAgent}
@@ -276,26 +224,22 @@ export function PokerTable({ participant, onRestart }: PokerTableProps) {
           onSelect={isDealer ? undefined : () => handleSelectCard(currentAgent.key)}
           onSkip={isDealer ? undefined : () => setShowCard(false)}
           onDismiss={isDealer ? () => setShowCard(false) : undefined}
-          selectedBy={selections
-            .filter((s) => s.agent_key === currentAgent.key)
-            .map((s) => ({ name: s.name, company: s.company }))}
+          selectedBy={selections.filter((s) => s.agent_key === currentAgent.key).map((s) => ({ name: s.name, company: s.company }))}
         />
       )}
 
-      {/* Viewing a past card — broadcast by dealer, visible to all */}
+      {/* Reviewing a past card */}
       {viewingAgent && !showCard && (
         <RevealedCard
           agent={viewingAgent}
           isSelected={mySelections.includes(viewingAgent.key)}
           onSelect={isDealer ? undefined : () => handleSelectCard(viewingAgent.key)}
           onDismiss={isDealer ? handleCloseReview : () => setViewingAgent(null)}
-          selectedBy={selections
-            .filter((s) => s.agent_key === viewingAgent.key)
-            .map((s) => ({ name: s.name, company: s.company }))}
+          selectedBy={selections.filter((s) => s.agent_key === viewingAgent.key).map((s) => ({ name: s.name, company: s.company }))}
         />
       )}
 
-      {/* Agent colour legend — builds as cards are flipped */}
+      {/* Agent legend */}
       {currentCardIndex >= 0 && (
         <div className="z-30 mt-4 w-full max-w-lg">
           <div className="bg-black/40 border border-white/10 rounded-xl p-4 backdrop-blur-sm">
@@ -303,10 +247,7 @@ export function PokerTable({ participant, onRestart }: PokerTableProps) {
             <div className="flex flex-col gap-1.5">
               {agents.slice(0, currentCardIndex + 1).map((agent, i) => (
                 <div key={agent.key} className="flex items-center gap-2">
-                  <div
-                    className="w-3 h-3 rounded-full flex-shrink-0"
-                    style={{ background: getAgentColor(i) }}
-                  />
+                  <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ background: getAgentColor(i) }} />
                   <span className="text-xs text-muted-foreground">{agent.title}</span>
                 </div>
               ))}
@@ -328,7 +269,7 @@ export function PokerTable({ participant, onRestart }: PokerTableProps) {
         </div>
       </div>
 
-      {/* Played cards row — dealer only */}
+      {/* Played cards — dealer only */}
       {isDealer && currentCardIndex >= 0 && (
         <div className="z-30 mt-4 flex flex-col items-center gap-2">
           <p className="text-[10px] text-muted-foreground">Played Cards — tap to flip again</p>
@@ -341,13 +282,9 @@ export function PokerTable({ participant, onRestart }: PokerTableProps) {
                   onClick={() => handleDealerReviewCard(agent)}
                   className="relative w-16 h-22 md:w-20 md:h-28 rounded-md border-2 shadow-lg hover:scale-110 transition-transform overflow-hidden"
                   style={{
-                    background: selected
-                      ? "linear-gradient(135deg, hsl(300, 60%, 40%), hsl(300, 50%, 25%))"
-                      : "linear-gradient(135deg, hsl(0, 70%, 45%), hsl(0, 60%, 30%))",
+                    background: selected ? "linear-gradient(135deg, hsl(300, 60%, 40%), hsl(300, 50%, 25%))" : "linear-gradient(135deg, hsl(0, 70%, 45%), hsl(0, 60%, 30%))",
                     borderColor: selected ? "hsl(300, 60%, 60%)" : "rgba(255,255,255,0.8)",
-                    boxShadow: selected
-                      ? "0 0 12px hsl(300, 60%, 60%, 0.5)"
-                      : "0 4px 12px rgba(0,0,0,0.4)",
+                    boxShadow: selected ? "0 0 12px hsl(300, 60%, 60%, 0.5)" : "0 4px 12px rgba(0,0,0,0.4)",
                   }}
                   title={agent.title}
                 >
@@ -356,9 +293,7 @@ export function PokerTable({ participant, onRestart }: PokerTableProps) {
                     <span className="text-[7px] md:text-[8px] font-bold text-white/90 leading-tight text-center font-['Space_Grotesk']">
                       {agent.title.replace(" Agent", "")}
                     </span>
-                    {selected && (
-                      <span className="text-[6px] text-green-300 mt-0.5 font-semibold">✓ selected</span>
-                    )}
+                    {selected && <span className="text-[6px] text-green-300 mt-0.5 font-semibold">✓ selected</span>}
                   </div>
                 </button>
               );
@@ -366,7 +301,8 @@ export function PokerTable({ participant, onRestart }: PokerTableProps) {
           </div>
         </div>
       )}
-      {/* Restart confirmation dialog */}
+
+      {/* Restart confirmation */}
       {showRestartConfirm && (
         <div className="fixed inset-0 z-[70] flex items-center justify-center">
           <div className="absolute inset-0 bg-black/70" onClick={() => setShowRestartConfirm(false)} />

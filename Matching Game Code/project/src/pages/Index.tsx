@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import * as gameApi from "@/lib/gameApi";
 import { SignInForm } from "@/components/SignInForm";
 import { PokerTable } from "@/components/PokerTable";
 
@@ -13,46 +13,34 @@ interface Participant {
 const Index = () => {
   const [participant, setParticipant] = useState<Participant | null>(null);
   const [loading, setLoading] = useState(false);
-  const [testMode, setTestMode] = useState(false);
-  const [testParticipants, setTestParticipants] = useState<Participant[]>([]);
-  const [activeTestIndex, setActiveTestIndex] = useState(0);
   const [dealerExists, setDealerExists] = useState(false);
   const [signInError, setSignInError] = useState<string | null>(null);
 
   useEffect(() => {
     const checkDealer = async () => {
-      const [{ data: parts }, { data: gs }] = await Promise.all([
-        supabase.from("participants").select("id, created_at").eq("role", "dealer"),
-        supabase.from("game_state").select("current_card_index").limit(1).single(),
-      ]);
-      if (!parts || parts.length === 0) {
-        setDealerExists(false);
-        return;
+      try {
+        const [parts, gs] = await Promise.all([
+          gameApi.participants.list(),
+          gameApi.gameState.get(),
+        ]);
+        const dealers = parts.filter(p => p.role === "dealer");
+        if (dealers.length === 0) { setDealerExists(false); return; }
+        const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString();
+        const dealerIsRecent = dealers[0].created_at > twoHoursAgo;
+        const gameIsActive = gs.current_card_index >= 0;
+        setDealerExists(dealerIsRecent || gameIsActive);
+      } catch {
+        // Silently ignore — API might not be ready yet
       }
-      const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString();
-      const dealerIsRecent = parts[0].created_at > twoHoursAgo;
-      const gameIsActive = gs && gs.current_card_index >= 0;
-      setDealerExists(dealerIsRecent || !!gameIsActive);
     };
     checkDealer();
     const poll = setInterval(checkDealer, 3000);
-    const ch = supabase
-      .channel("signin-participants")
-      .on("postgres_changes", { event: "*", schema: "public", table: "participants" }, checkDealer)
-      .subscribe();
-    return () => { clearInterval(poll); supabase.removeChannel(ch); };
+    return () => clearInterval(poll);
   }, []);
 
   const handleRestart = async () => {
-    const { data: gs } = await supabase.from("game_state").select("id").limit(1).single();
-    await Promise.all([
-      supabase.from("selections").delete().neq("id", "00000000-0000-0000-0000-000000000000"),
-      supabase.from("participants").delete().neq("id", "00000000-0000-0000-0000-000000000000"),
-      gs ? supabase.from("game_state").update({ current_card_index: -1 }).eq("id", gs.id) : Promise.resolve(),
-    ]);
+    await gameApi.resetGame();
     setParticipant(null);
-    setTestMode(false);
-    setTestParticipants([]);
     setDealerExists(false);
   };
 
@@ -61,20 +49,13 @@ const Index = () => {
     setSignInError(null);
     try {
       const timeout = new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error("Could not reach the game server. The server may be waking up — please try again in a few seconds.")), 8000)
+        setTimeout(() => reject(new Error("Could not reach the game server. Please try again in a few seconds.")), 10000)
       );
-      const { data, error } = await Promise.race([
-        supabase.from("participants").insert({ name, company, role }).select().single(),
+      const p = await Promise.race([
+        gameApi.participants.create({ name, company, role }),
         timeout,
       ]);
-
-      if (error) {
-        setSignInError(error.message);
-        return;
-      }
-
-      const p = { id: data.id, name: data.name, company: data.company, role: (data.role as "dealer" | "player") };
-      setParticipant(p);
+      setParticipant({ id: p.id, name: p.name, company: p.company, role: p.role });
     } catch (err: any) {
       setSignInError(err.message ?? "Connection error — please try again.");
     } finally {
@@ -82,80 +63,26 @@ const Index = () => {
     }
   };
 
-  // Test mode: show sign-in for adding more users + switcher
-  if (testMode && testParticipants.length > 0) {
-    const active = testParticipants[activeTestIndex] || testParticipants[0];
-
-    return (
-      <div className="relative min-h-screen" style={{ background: "linear-gradient(135deg, hsl(0, 60%, 12%), hsl(0, 40%, 8%))" }}>
-        {/* Test mode banner */}
-        <div className="fixed top-0 left-0 right-0 z-[60] bg-destructive/90 text-destructive-foreground text-center py-1 text-xs font-semibold flex items-center justify-center gap-4">
-          <span>🧪 TEST MODE — Playing as: {active.name}</span>
-          <div className="flex gap-1">
-            {testParticipants.map((p, i) => (
-              <button
-                key={p.id}
-                onClick={() => {
-                  setActiveTestIndex(i);
-                  setParticipant(p);
-                }}
-                className={`px-2 py-0.5 rounded text-[10px] font-medium transition-all ${
-                  i === activeTestIndex
-                    ? "bg-background text-foreground"
-                    : "bg-destructive-foreground/20 text-destructive-foreground hover:bg-destructive-foreground/30"
-                }`}
-              >
-                {p.name} ({p.role === "dealer" ? "🃏" : "🎮"})
-              </button>
-            ))}
-          </div>
-          <button
-            onClick={() => {
-              setParticipant(null);
-            }}
-            className="px-2 py-0.5 rounded bg-background/20 text-[10px] hover:bg-background/30"
-          >
-            + Add User
-          </button>
-          <button
-            onClick={() => {
-              setTestMode(false);
-              setTestParticipants([]);
-              setParticipant(null);
-            }}
-            className="px-2 py-0.5 rounded bg-background/20 text-[10px] hover:bg-background/30"
-          >
-            Exit Test
-          </button>
-        </div>
-
-        <div className="pt-8">
-          {participant === null ? (
-            <SignInForm onSignIn={handleSignIn} loading={loading} onRestart={handleRestart} dealerExists={dealerExists} error={signInError} />
-          ) : (
-            <PokerTable participant={active} onRestart={() => { setTestParticipants([]); setParticipant(null); setActiveTestIndex(0); }} />
-          )}
-        </div>
-      </div>
-    );
-  }
-
   if (!participant) {
     return (
-      <div className="relative min-h-screen" style={testMode ? { background: "linear-gradient(135deg, hsl(0, 60%, 12%), hsl(0, 40%, 8%))" } : undefined}>
-        {testMode && (
-          <div className="fixed top-0 left-0 right-0 z-50 bg-destructive/90 text-destructive-foreground text-center py-1 text-xs font-semibold">
-            🧪 TEST MODE ACTIVE
-          </div>
-        )}
-        <div className={testMode ? "pt-8" : ""}>
-          <SignInForm onSignIn={handleSignIn} loading={loading} onRestart={handleRestart} dealerExists={dealerExists} error={signInError} />
-        </div>
+      <div className="relative min-h-screen">
+        <SignInForm
+          onSignIn={handleSignIn}
+          loading={loading}
+          onRestart={handleRestart}
+          dealerExists={dealerExists}
+          error={signInError}
+        />
       </div>
     );
   }
 
-  return <PokerTable participant={participant} onRestart={() => { setParticipant(null); setTestMode(false); setTestParticipants([]); }} />;
+  return (
+    <PokerTable
+      participant={participant}
+      onRestart={() => { setParticipant(null); setDealerExists(false); }}
+    />
+  );
 };
 
 export default Index;
