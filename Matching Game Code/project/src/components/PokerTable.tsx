@@ -170,10 +170,12 @@ export function PokerTable({ participant, onRestart }: PokerTableProps) {
           <p className="text-[10px] text-white/70">
             Playing as <span className="text-white font-medium">{participant.name}</span> · {participant.company}
           </p>
-          <button onClick={() => exportSelectionsToExcel(selectionsForExport)}
-            className="text-xs px-3 py-1 rounded-full bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-colors">
-            📊 Export
-          </button>
+          {isDealer && (
+            <button onClick={() => exportSelectionsToExcel(selectionsForExport)}
+              className="text-xs px-3 py-1 rounded-full bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-colors">
+              📊 Export
+            </button>
+          )}
           <button onClick={() => setShowRestartConfirm(true)}
             className="text-xs px-3 py-1 rounded-full bg-destructive text-destructive-foreground font-medium hover:bg-destructive/90 transition-colors">
             🔄 Restart
