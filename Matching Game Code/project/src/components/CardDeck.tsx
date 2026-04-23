@@ -21,7 +21,7 @@ export function CardDeck({ currentCardIndex, onFlipNext, canFlip }: CardDeckProp
   };
 
   return (
-    <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 flex flex-col items-center gap-2">
+    <div className="flex flex-col items-center gap-2">
       {/* Deck stack */}
       <div className={`relative ${canFlip ? 'cursor-pointer' : 'cursor-default'}`} onClick={handleFlip}>
         {[...Array(Math.min(Math.max(remainingCards, 0), 4))].map((_, i) => (

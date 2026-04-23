@@ -5,11 +5,11 @@ interface AnimatedPersonProps {
   name: string;
   company: string;
   index: number;
-  total: number;
   isCurrentUser: boolean;
   selectedCards: string[];
   cardTitles: Record<string, string>;
   role?: "dealer" | "player";
+  scale?: number;
 }
 
 const AVATAR_COLORS = [
@@ -29,11 +29,11 @@ export function AnimatedPerson({
   name,
   company,
   index,
-  total,
   isCurrentUser,
   selectedCards,
   cardTitles,
   role = "player",
+  scale = 1,
 }: AnimatedPersonProps) {
   const [bobOffset, setBobOffset] = useState(0);
   const [blinkOpen, setBlinkOpen] = useState(true);
@@ -55,28 +55,26 @@ export function AnimatedPerson({
     return () => clearInterval(interval);
   }, [index]);
 
-  // Position around the table ellipse
-  const angle = (index / Math.max(total, 1)) * Math.PI * 2 - Math.PI / 2;
-  const radiusX = 42;
-  const radiusY = 38;
-  const x = 50 + radiusX * Math.cos(angle);
-  const y = 50 + radiusY * Math.sin(angle);
-
   const colors = AVATAR_COLORS[index % AVATAR_COLORS.length];
 
   // Colour each dot by the agent's position in cardTitles (matches legend)
   const cardKeys = Object.keys(cardTitles);
   const getCardColor = (key: string) => getAgentColor(cardKeys.indexOf(key));
 
+  const s = scale;
+  const personW = Math.round(48 * s);
+  const personH = Math.round(56 * s);
+  const stoolW  = Math.round(44 * s);
+  const stoolH  = Math.round(60 * s);
+  const crownW  = Math.round(24 * s);
+  const crownH  = Math.round(15 * s);
+  const crownTop = Math.round(-20 * s);
+  const nameMaxW = Math.round(90 * s);
+
   return (
     <div
-      className="absolute flex flex-col items-center z-10"
-      style={{
-        left: `${x}%`,
-        top: `${y}%`,
-        transform: `translate(-50%, -50%) translateY(${bobOffset}px)`,
-        transition: "left 0.5s ease, top 0.5s ease",
-      }}
+      className="relative flex-shrink-0 flex flex-col items-center z-10"
+      style={{ transform: `translateY(${bobOffset}px)` }}
     >
       {/* Golden glow for current user */}
       {isCurrentUser && (
@@ -93,13 +91,13 @@ export function AnimatedPerson({
         <div
           className="absolute z-20"
           style={{
-            top: "-20px",
+            top: `${crownTop}px`,
             left: "50%",
             transform: "translateX(-50%)",
             filter: "drop-shadow(0 0 5px hsl(45, 100%, 65%)) drop-shadow(0 0 2px hsl(35, 80%, 40%))",
           }}
         >
-          <svg width="24" height="15" viewBox="0 0 24 15" fill="none">
+          <svg width={crownW} height={crownH} viewBox="0 0 24 15" fill="none">
             {/* Crown body */}
             <path
               d="M1 14 L1 8.5 L6 2 L12 7.5 L18 2 L23 8.5 L23 14 Z"
@@ -125,7 +123,7 @@ export function AnimatedPerson({
       )}
 
       {/* SVG Head */}
-      <svg width="48" height="56" viewBox="0 0 48 56" fill="none" className="md:w-14 md:h-16 drop-shadow-lg">
+      <svg width={personW} height={personH} viewBox="0 0 48 56" fill="none" className="drop-shadow-lg">
         {/* Neck */}
         <rect x="18" y="38" width="12" height="8" rx="3" fill={colors.skin} />
         
@@ -212,10 +210,27 @@ export function AnimatedPerson({
         )}
       </svg>
 
+      {/* Stool */}
+      <svg width={stoolW} height={stoolH} viewBox="0 0 44 60" fill="none" className="-mt-1">
+        {/* Seat */}
+        <ellipse cx="22" cy="5" rx="17" ry="5" fill="hsl(0,0%,9%)" stroke="hsl(0,0%,22%)" strokeWidth="1"/>
+        <ellipse cx="22" cy="3" rx="15" ry="3.5" fill="hsl(0,0%,13%)"/>
+        {/* Center pole */}
+        <rect x="19.5" y="10" width="5" height="34" rx="2.5" fill="hsl(0,0%,7%)" stroke="hsl(0,0%,17%)" strokeWidth="0.5"/>
+        {/* Footrest */}
+        <rect x="8" y="28" width="28" height="3.5" rx="1.75" fill="hsl(0,0%,9%)" stroke="hsl(0,0%,24%)" strokeWidth="0.6"/>
+        {/* Base legs */}
+        <line x1="22" y1="44" x2="5"  y2="58" stroke="hsl(0,0%,8%)"  strokeWidth="3.5" strokeLinecap="round"/>
+        <line x1="22" y1="44" x2="39" y2="58" stroke="hsl(0,0%,8%)"  strokeWidth="3.5" strokeLinecap="round"/>
+        <line x1="22" y1="44" x2="11" y2="56" stroke="hsl(0,0%,6%)" strokeWidth="3"   strokeLinecap="round"/>
+        <line x1="22" y1="44" x2="33" y2="56" stroke="hsl(0,0%,6%)" strokeWidth="3"   strokeLinecap="round"/>
+      </svg>
+
       {/* Name tag */}
       <div
-        className="mt-0.5 text-center px-2 py-0.5 rounded-md max-w-[80px] md:max-w-[100px]"
+        className="mt-0.5 text-center px-2 py-0.5 rounded-md"
         style={{
+          maxWidth: `${nameMaxW}px`,
           background: isCurrentUser ? "hsl(45, 95%, 52%, 0.12)" : "hsl(222, 40%, 12%, 0.8)",
           border: isCurrentUser ? "1px solid hsl(45, 95%, 52%, 0.5)" : "1px solid hsl(222, 30%, 22%)",
         }}

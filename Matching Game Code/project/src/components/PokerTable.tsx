@@ -7,6 +7,7 @@ import { RevealedCard } from "@/components/RevealedCard";
 import { useToast } from "@/hooks/use-toast";
 import { exportSelectionsToExcel } from "@/utils/exportSelections";
 import { getAgentColor } from "@/data/agentColors";
+import { DynamicsSign } from "@/components/DynamicsSign";
 
 interface Participant {
   id: string;
@@ -179,12 +180,17 @@ export function PokerTable({ participant, onRestart }: PokerTableProps) {
   };
 
   const cardTitles = Object.fromEntries(agents.map((a) => [a.key, a.title]));
+  const dealerParticipant = participants.find((p) => p.role === "dealer") ?? null;
+  const players = participants.filter((p) => p.role === "player");
+  const totalPeople = (dealerParticipant ? 1 : 0) + players.length;
+  const personScale = totalPeople <= 5 ? 1 : totalPeople <= 8 ? 0.85 : 0.72;
+  const stageGap = totalPeople <= 5 ? "gap-6" : totalPeople <= 8 ? "gap-4" : "gap-3";
 
   return (
     <div
       className="min-h-screen flex flex-col items-center justify-center p-4 overflow-hidden relative"
       style={{
-        backgroundImage: `url('${import.meta.env.BASE_URL}images/casino-bg.png')`,
+        backgroundImage: `url('${import.meta.env.BASE_URL}images/dating game background.png')`,
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
@@ -194,11 +200,7 @@ export function PokerTable({ participant, onRestart }: PokerTableProps) {
       <div className="absolute inset-0 bg-black/60 pointer-events-none" />
       {/* Header */}
       <div className="text-center mb-4 z-30">
-        <img
-          src={`${import.meta.env.BASE_URL}images/casino-sign.png`}
-          alt="Dynamics Agents"
-          className="mx-auto h-36 md:h-48 w-auto drop-shadow-2xl animate-sign-glow"
-        />
+        <DynamicsSign className="mx-auto mb-1" />
         <p className="text-[10px] md:text-xs text-muted-foreground">
           Playing as <span className="text-foreground font-medium">{participant.name}</span> · {participant.company}
         </p>
@@ -218,51 +220,52 @@ export function PokerTable({ participant, onRestart }: PokerTableProps) {
         </div>
       </div>
 
-      {/* Table container */}
-      <div className="relative w-full max-w-3xl aspect-square md:aspect-[4/3]">
-        {/* Table surface */}
+      {/* Stage */}
+      <div className="relative w-full z-20">
+        {/* Stage floor */}
         <div
-          className="absolute inset-[8%] rounded-[50%] border-4"
+          className="absolute bottom-0 left-0 right-0 h-14"
           style={{
-            background: "radial-gradient(ellipse at center, hsl(120, 50%, 30%), hsl(120, 45%, 22%), hsl(120, 40%, 14%))",
-            borderColor: "hsl(30, 50%, 25%)",
-            boxShadow: "inset 0 0 60px hsl(150, 30%, 8%), 0 0 40px hsl(0, 0%, 0%, 0.5), 0 10px 30px hsl(0, 0%, 0%, 0.3)",
-          }}
-        >
-          <div
-            className="absolute inset-0 rounded-[50%] opacity-10"
-            style={{
-              backgroundImage: "repeating-linear-gradient(45deg, transparent, transparent 10px, hsl(150, 40%, 30%) 10px, hsl(150, 40%, 30%) 11px)",
-            }}
-          />
-        </div>
-
-        {/* Wood rim */}
-        <div
-          className="absolute inset-[6%] rounded-[50%] border-8 pointer-events-none"
-          style={{
-            borderColor: "hsl(30, 40%, 20%)",
-            boxShadow: "inset 0 2px 8px hsl(30, 50%, 30%, 0.3)",
+            background: "linear-gradient(to bottom, hsl(0,0%,14%), hsl(0,0%,9%))",
+            borderTop: "2px solid hsl(0,0%,28%)",
+            boxShadow: "0 -6px 24px rgba(0,0,0,0.6)",
           }}
         />
-
-        {/* Card deck in center */}
-        <CardDeck currentCardIndex={currentCardIndex} onFlipNext={handleFlipNext} canFlip={isDealer} />
-
-        {/* People around the table */}
-        {[...participants].sort((a, b) => (a.role === "dealer" ? -1 : b.role === "dealer" ? 1 : 0)).map((p, i) => (
-          <AnimatedPerson
-            key={p.id}
-            name={p.name}
-            company={p.company}
-            index={i}
-            total={participants.length}
-            isCurrentUser={p.id === participant.id}
-            selectedCards={selections.filter((s) => s.participant_id === p.id).map((s) => s.agent_key)}
-            cardTitles={cardTitles}
-            role={p.role}
-          />
-        ))}
+        {/* Characters + deck row */}
+        <div className={`relative flex flex-row items-end ${stageGap} px-6 md:px-10 pb-12 overflow-x-auto`}>
+          {/* Dealer — far left */}
+          {dealerParticipant && (
+            <AnimatedPerson
+              key={dealerParticipant.id}
+              name={dealerParticipant.name}
+              company={dealerParticipant.company}
+              index={0}
+              isCurrentUser={dealerParticipant.id === participant.id}
+              selectedCards={selections.filter((s) => s.participant_id === dealerParticipant.id).map((s) => s.agent_key)}
+              cardTitles={cardTitles}
+              role="dealer"
+              scale={personScale}
+            />
+          )}
+          {/* Card deck */}
+          <div className="flex-shrink-0 pb-2 flex flex-col items-center">
+            <CardDeck currentCardIndex={currentCardIndex} onFlipNext={handleFlipNext} canFlip={isDealer} />
+          </div>
+          {/* Players */}
+          {players.map((p, i) => (
+            <AnimatedPerson
+              key={p.id}
+              name={p.name}
+              company={p.company}
+              index={i + 1}
+              isCurrentUser={p.id === participant.id}
+              selectedCards={selections.filter((s) => s.participant_id === p.id).map((s) => s.agent_key)}
+              cardTitles={cardTitles}
+              role="player"
+              scale={personScale}
+            />
+          ))}
+        </div>
       </div>
 
       {/* Revealed card overlay */}
