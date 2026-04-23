@@ -1,12 +1,12 @@
 import { useState, useEffect, useRef } from "react";
 import * as gameApi from "@/lib/gameApi";
-import { getAgentColor } from "@/data/agentColors";
 import { agents } from "@/data/agents";
 import { AnimatedPerson } from "@/components/AnimatedPerson";
 import { CardDeck } from "@/components/CardDeck";
 import { RevealedCard } from "@/components/RevealedCard";
 import { useToast } from "@/hooks/use-toast";
 import { exportSelectionsToExcel } from "@/utils/exportSelections";
+import { getAgentColor } from "@/data/agentColors";
 
 interface Participant {
   id: string;
@@ -31,7 +31,6 @@ export function PokerTable({ participant, onRestart }: PokerTableProps) {
   const [participants, setParticipants] = useState<Participant[]>([]);
   const [selections, setSelections] = useState<SelectionWithInfo[]>([]);
   const [currentCardIndex, setCurrentCardIndex] = useState(-1);
-  const [gameStateId] = useState("state");
   const [showCard, setShowCard] = useState(false);
   const [viewingAgent, setViewingAgent] = useState<typeof agents[number] | null>(null);
   const [showRestartConfirm, setShowRestartConfirm] = useState(false);
@@ -42,7 +41,10 @@ export function PokerTable({ participant, onRestart }: PokerTableProps) {
   const isDealer = participant.role === "dealer";
   const mySelections = selections.filter((s) => s.participant_id === participant.id).map((s) => s.agent_key);
   const currentAgent = currentCardIndex >= 0 && currentCardIndex < agents.length ? agents[currentCardIndex] : null;
-  const allDealt = currentCardIndex >= agents.length - 1;
+
+  const dealer = participants.find(p => p.role === "dealer");
+  const players = participants.filter(p => p.role === "player");
+  const allParticipantsSorted = dealer ? [dealer, ...players] : players;
 
   const fetchAll = async () => {
     try {
@@ -56,13 +58,10 @@ export function PokerTable({ participant, onRestart }: PokerTableProps) {
 
       const newIndex = gs.current_card_index;
       const prevIndex = lastCardIndexRef.current;
-      if (prevIndex !== -2 && newIndex !== prevIndex && newIndex >= 0) {
-        setShowCard(true);
-      }
+      if (prevIndex !== -2 && newIndex !== prevIndex && newIndex >= 0) setShowCard(true);
       lastCardIndexRef.current = newIndex;
       setCurrentCardIndex(newIndex);
 
-      // Reviewing card key — broadcast replacement via polled game state
       const newReviewingKey = gs.reviewing_card_key || null;
       const prevReviewingKey = lastReviewingKeyRef.current;
       if (!isDealer && prevReviewingKey !== undefined && newReviewingKey !== prevReviewingKey) {
@@ -76,7 +75,7 @@ export function PokerTable({ participant, onRestart }: PokerTableProps) {
       lastReviewingKeyRef.current = newReviewingKey;
 
       const enriched = sels.map((s) => {
-        const p = parts.find((p) => p.id === s.participant_id);
+        const p = parts.find(p => p.id === s.participant_id);
         return { ...s, name: p?.name ?? "Unknown", company: p?.company ?? "" };
       });
       setSelections(enriched);
@@ -107,7 +106,7 @@ export function PokerTable({ participant, onRestart }: PokerTableProps) {
       return;
     }
     await gameApi.selections.create({ participant_id: participant.id, agent_key: agentKey });
-    const agent = agents.find((a) => a.key === agentKey);
+    const agent = agents.find(a => a.key === agentKey);
     toast({ title: "Card selected!", description: `You chose: ${agent?.title}` });
     setShowCard(false);
   };
@@ -118,7 +117,7 @@ export function PokerTable({ participant, onRestart }: PokerTableProps) {
     setViewingAgent(null);
     lastCardIndexRef.current = -2;
     lastReviewingKeyRef.current = undefined;
-    toast({ title: "Game restarted!", description: "All users cleared and cards returned to the deck." });
+    toast({ title: "Game restarted!" });
     onRestart?.();
   };
 
@@ -132,18 +131,12 @@ export function PokerTable({ participant, onRestart }: PokerTableProps) {
     await gameApi.gameState.update({ reviewing_card_key: null });
   };
 
-  const cardTitles = Object.fromEntries(agents.map((a) => [a.key, a.title]));
-
-  const selectionsForExport = selections.map(s => ({
-    participant_id: s.participant_id,
-    agent_key: s.agent_key,
-    name: s.name,
-    company: s.company,
-  }));
+  const cardTitles = Object.fromEntries(agents.map(a => [a.key, a.title]));
+  const selectionsForExport = selections.map(s => ({ participant_id: s.participant_id, agent_key: s.agent_key, name: s.name, company: s.company }));
 
   return (
     <div
-      className="min-h-screen flex flex-col items-center justify-center p-4 overflow-hidden relative"
+      className="min-h-screen flex flex-col overflow-hidden"
       style={{
         backgroundImage: `url('${import.meta.env.BASE_URL}images/dating-game-background.png')`,
         backgroundSize: "cover",
@@ -151,72 +144,153 @@ export function PokerTable({ participant, onRestart }: PokerTableProps) {
         backgroundRepeat: "no-repeat",
       }}
     >
-      <div className="absolute inset-0 bg-black/60 pointer-events-none" />
+      {/* Dark overlay */}
+      <div className="absolute inset-0 bg-black/50 pointer-events-none" />
 
-      {/* Header */}
-      <div className="text-center mb-4 z-30">
-        <img
-          src={`${import.meta.env.BASE_URL}images/dgSign.png`}
-          alt="Dynamics Agents"
-          className="mx-auto h-36 md:h-48 w-auto drop-shadow-2xl animate-sign-glow"
-        />
-        <p className="text-[10px] md:text-xs text-muted-foreground">
-          Playing as <span className="text-foreground font-medium">{participant.name}</span> · {participant.company}
-        </p>
-        <div className="flex items-center gap-3 mt-1">
-          <button
-            onClick={() => exportSelectionsToExcel(selectionsForExport)}
-            className="text-xs px-4 py-1.5 rounded-full bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-colors shadow-md"
-          >
-            📊 Export
-          </button>
-          <button
-            onClick={() => setShowRestartConfirm(true)}
-            className="text-xs px-4 py-1.5 rounded-full bg-destructive text-destructive-foreground font-medium hover:bg-destructive/90 transition-colors shadow-md"
-          >
-            🔄 Restart Game
-          </button>
-        </div>
-      </div>
-
-      {/* Table */}
-      <div className="relative w-full max-w-3xl aspect-square md:aspect-[4/3]">
-        <div
-          className="absolute inset-[8%] rounded-[50%] border-4"
+      {/* ── TITLE ── */}
+      <div className="relative z-30 flex flex-col items-center pt-6 pb-2">
+        <h1
           style={{
-            background: "radial-gradient(ellipse at center, hsl(120, 50%, 30%), hsl(120, 45%, 22%), hsl(120, 40%, 14%))",
-            borderColor: "hsl(30, 50%, 25%)",
-            boxShadow: "inset 0 0 60px hsl(150, 30%, 8%), 0 0 40px hsl(0, 0%, 0%, 0.5), 0 10px 30px hsl(0, 0%, 0%, 0.3)",
+            fontFamily: "'Fredoka One', 'Arial Black', sans-serif",
+            fontSize: "clamp(2.2rem, 7vw, 4.5rem)",
+            color: "#c4521a",
+            fontStyle: "italic",
+            textShadow: "2px 2px 0 #8b3210, 4px 4px 0 #6b2208, 6px 6px 0 rgba(0,0,0,0.35)",
+            WebkitTextStroke: "1px #8b3210",
+            letterSpacing: "0.04em",
+            lineHeight: 1,
+            textAlign: "center",
           }}
         >
-          <div
-            className="absolute inset-0 rounded-[50%] opacity-10"
-            style={{
-              backgroundImage: "repeating-linear-gradient(45deg, transparent, transparent 10px, hsl(150, 40%, 30%) 10px, hsl(150, 40%, 30%) 11px)",
-            }}
-          />
+          DYNAMICS AGENTS
+        </h1>
+
+        {/* Controls */}
+        <div className="flex items-center gap-3 mt-2">
+          <p className="text-[10px] text-white/70">
+            Playing as <span className="text-white font-medium">{participant.name}</span> · {participant.company}
+          </p>
+          <button onClick={() => exportSelectionsToExcel(selectionsForExport)}
+            className="text-xs px-3 py-1 rounded-full bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-colors">
+            📊 Export
+          </button>
+          <button onClick={() => setShowRestartConfirm(true)}
+            className="text-xs px-3 py-1 rounded-full bg-destructive text-destructive-foreground font-medium hover:bg-destructive/90 transition-colors">
+            🔄 Restart
+          </button>
         </div>
-        <div
-          className="absolute inset-[6%] rounded-[50%] border-8 pointer-events-none"
-          style={{ borderColor: "hsl(30, 40%, 20%)", boxShadow: "inset 0 2px 8px hsl(30, 50%, 30%, 0.3)" }}
-        />
-        <CardDeck currentCardIndex={currentCardIndex} onFlipNext={handleFlipNext} canFlip={isDealer} />
-        {[...participants].sort((a, b) => (a.role === "dealer" ? -1 : b.role === "dealer" ? 1 : 0)).map((p, i) => (
-          <AnimatedPerson
-            key={p.id}
-            name={p.name}
-            company={p.company}
-            index={i}
-            total={participants.length}
-            isCurrentUser={p.id === participant.id}
-            selectedCards={selections.filter((s) => s.participant_id === p.id).map((s) => s.agent_key)}
-            cardTitles={cardTitles}
-            role={p.role}
-          />
-        ))}
       </div>
 
-      {/* Current card overlay */}
+      {/* ── MAIN GAME FLOOR ── */}
+      <div className="relative z-10 flex-1 flex items-end px-4 md:px-8 pb-4 gap-6 overflow-x-auto">
+
+        {/* LEFT: Dealer + Card Deck */}
+        <div className="flex items-end gap-4 flex-shrink-0">
+          {/* Dealer avatar */}
+          {dealer && (
+            <div className="flex flex-col items-center">
+              <p className="text-[9px] uppercase tracking-widest text-white/60 mb-1 font-semibold">Host</p>
+              <AnimatedPerson
+                name={dealer.name}
+                company={dealer.company}
+                index={0}
+                isCurrentUser={dealer.id === participant.id}
+                selectedCards={selections.filter(s => s.participant_id === dealer.id).map(s => s.agent_key)}
+                cardTitles={cardTitles}
+                role="dealer"
+              />
+            </div>
+          )}
+
+          {/* Card deck */}
+          <div className="flex flex-col items-center justify-end pb-14">
+            <CardDeck currentCardIndex={currentCardIndex} onFlipNext={handleFlipNext} canFlip={isDealer} />
+          </div>
+        </div>
+
+        {/* Divider */}
+        <div className="self-stretch w-px bg-white/20 flex-shrink-0 mb-14" />
+
+        {/* CENTER/RIGHT: Players on stools */}
+        <div className="flex items-end gap-4 flex-1 flex-wrap">
+          {players.length === 0 && (
+            <p className="text-white/40 text-sm italic pb-16 pl-4">Waiting for participants to join…</p>
+          )}
+          {players.map((p, i) => (
+            <AnimatedPerson
+              key={p.id}
+              name={p.name}
+              company={p.company}
+              index={i + 1}
+              isCurrentUser={p.id === participant.id}
+              selectedCards={selections.filter(s => s.participant_id === p.id).map(s => s.agent_key)}
+              cardTitles={cardTitles}
+              role="player"
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* ── BOTTOM PANELS ── */}
+      <div className="relative z-20 flex flex-wrap gap-3 px-4 md:px-8 pb-4">
+
+        {/* Card legend */}
+        {currentCardIndex >= 0 && (
+          <div className="bg-black/50 border border-white/10 rounded-xl p-3 backdrop-blur-sm min-w-[180px]">
+            <h3 className="text-[10px] font-semibold uppercase tracking-wider text-primary mb-1.5">Card Legend</h3>
+            <div className="flex flex-col gap-1">
+              {agents.slice(0, currentCardIndex + 1).map((agent, i) => (
+                <div key={agent.key} className="flex items-center gap-1.5">
+                  <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: getAgentColor(i) }} />
+                  <span className="text-[10px] text-muted-foreground">{agent.title}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* How to Play */}
+        <div className="bg-black/50 border border-white/10 rounded-xl p-3 backdrop-blur-sm flex-1 min-w-[220px]">
+          <h3 className="text-[10px] font-semibold uppercase tracking-wider text-primary mb-1.5">How to Play</h3>
+          <ol className="space-y-0.5 text-[10px] text-muted-foreground list-decimal list-inside">
+            <li>The host flips a card from the deck</li>
+            <li>The group discusses the agent shown</li>
+            <li>Each player selects or skips the card</li>
+            <li>The host can flip any past card again for discussion</li>
+          </ol>
+        </div>
+
+        {/* Played cards — host only */}
+        {isDealer && currentCardIndex >= 0 && (
+          <div className="bg-black/50 border border-white/10 rounded-xl p-3 backdrop-blur-sm">
+            <h3 className="text-[10px] font-semibold uppercase tracking-wider text-primary mb-1.5">Played Cards</h3>
+            <div className="flex gap-1.5 flex-wrap">
+              {agents.slice(0, currentCardIndex + 1).map((agent) => (
+                <button
+                  key={agent.key}
+                  onClick={() => handleDealerReviewCard(agent)}
+                  className="relative w-12 h-16 rounded border-2 shadow hover:scale-110 transition-transform overflow-hidden"
+                  style={{
+                    background: "linear-gradient(135deg, hsl(0, 70%, 45%), hsl(0, 60%, 30%))",
+                    borderColor: mySelections.includes(agent.key) ? "hsl(300, 60%, 60%)" : "rgba(255,255,255,0.7)",
+                  }}
+                  title={agent.title}
+                >
+                  <div className="absolute inset-[2px] rounded-sm border border-white/20" />
+                  <div className="relative flex items-center justify-center h-full z-10 px-0.5">
+                    <span className="text-[6px] font-bold text-white/90 leading-tight text-center">
+                      {agent.title.replace(" Agent", "")}
+                    </span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* ── OVERLAYS ── */}
+
       {showCard && currentAgent && (
         <RevealedCard
           agent={currentAgent}
@@ -224,104 +298,33 @@ export function PokerTable({ participant, onRestart }: PokerTableProps) {
           onSelect={isDealer ? undefined : () => handleSelectCard(currentAgent.key)}
           onSkip={isDealer ? undefined : () => setShowCard(false)}
           onDismiss={isDealer ? () => setShowCard(false) : undefined}
-          selectedBy={selections.filter((s) => s.agent_key === currentAgent.key).map((s) => ({ name: s.name, company: s.company }))}
+          selectedBy={selections.filter(s => s.agent_key === currentAgent.key).map(s => ({ name: s.name, company: s.company }))}
         />
       )}
 
-      {/* Reviewing a past card */}
       {viewingAgent && !showCard && (
         <RevealedCard
           agent={viewingAgent}
           isSelected={mySelections.includes(viewingAgent.key)}
           onSelect={isDealer ? undefined : () => handleSelectCard(viewingAgent.key)}
           onDismiss={isDealer ? handleCloseReview : () => setViewingAgent(null)}
-          selectedBy={selections.filter((s) => s.agent_key === viewingAgent.key).map((s) => ({ name: s.name, company: s.company }))}
+          selectedBy={selections.filter(s => s.agent_key === viewingAgent.key).map(s => ({ name: s.name, company: s.company }))}
         />
       )}
 
-      {/* Agent legend */}
-      {currentCardIndex >= 0 && (
-        <div className="z-30 mt-4 w-full max-w-lg">
-          <div className="bg-black/40 border border-white/10 rounded-xl p-4 backdrop-blur-sm">
-            <h3 className="text-xs font-semibold uppercase tracking-wider text-primary mb-2">Card Legend</h3>
-            <div className="flex flex-col gap-1.5">
-              {agents.slice(0, currentCardIndex + 1).map((agent, i) => (
-                <div key={agent.key} className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ background: getAgentColor(i) }} />
-                  <span className="text-xs text-muted-foreground">{agent.title}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* How to Play */}
-      <div className="z-30 mt-4 w-full max-w-lg">
-        <div className="bg-black/40 border border-white/10 rounded-xl p-4 backdrop-blur-sm">
-          <h3 className="text-xs font-semibold uppercase tracking-wider text-primary mb-2">How to Play</h3>
-          <ol className="space-y-1 text-xs text-muted-foreground list-decimal list-inside">
-            <li>The dealer flips a card from the deck</li>
-            <li>The group discusses the details shown on the card</li>
-            <li>Each player selects or skips the card</li>
-            <li>Once all cards have been dealt, the dealer can flip any card again for further discussion</li>
-          </ol>
-        </div>
-      </div>
-
-      {/* Played cards — dealer only */}
-      {isDealer && currentCardIndex >= 0 && (
-        <div className="z-30 mt-4 flex flex-col items-center gap-2">
-          <p className="text-[10px] text-muted-foreground">Played Cards — tap to flip again</p>
-          <div className="flex gap-2 flex-wrap justify-center">
-            {agents.slice(0, currentCardIndex + 1).map((agent) => {
-              const selected = mySelections.includes(agent.key);
-              return (
-                <button
-                  key={agent.key}
-                  onClick={() => handleDealerReviewCard(agent)}
-                  className="relative w-16 h-22 md:w-20 md:h-28 rounded-md border-2 shadow-lg hover:scale-110 transition-transform overflow-hidden"
-                  style={{
-                    background: selected ? "linear-gradient(135deg, hsl(300, 60%, 40%), hsl(300, 50%, 25%))" : "linear-gradient(135deg, hsl(0, 70%, 45%), hsl(0, 60%, 30%))",
-                    borderColor: selected ? "hsl(300, 60%, 60%)" : "rgba(255,255,255,0.8)",
-                    boxShadow: selected ? "0 0 12px hsl(300, 60%, 60%, 0.5)" : "0 4px 12px rgba(0,0,0,0.4)",
-                  }}
-                  title={agent.title}
-                >
-                  <div className="absolute inset-[2px] rounded-sm border border-white/30" />
-                  <div className="relative flex flex-col items-center justify-center h-full z-10 px-1">
-                    <span className="text-[7px] md:text-[8px] font-bold text-white/90 leading-tight text-center font-['Space_Grotesk']">
-                      {agent.title.replace(" Agent", "")}
-                    </span>
-                    {selected && <span className="text-[6px] text-green-300 mt-0.5 font-semibold">✓ selected</span>}
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
-      {/* Restart confirmation */}
       {showRestartConfirm && (
         <div className="fixed inset-0 z-[70] flex items-center justify-center">
           <div className="absolute inset-0 bg-black/70" onClick={() => setShowRestartConfirm(false)} />
           <div className="relative bg-card border border-border rounded-xl p-6 max-w-sm w-full mx-4 shadow-2xl">
-            <h3 className="text-lg font-semibold text-foreground mb-2">Restart Game?</h3>
-            <p className="text-sm text-muted-foreground mb-6">
-              This will clear all participants and selections and return all cards to the deck.
-            </p>
+            <h3 className="text-lg font-semibold mb-2">Restart Game?</h3>
+            <p className="text-sm text-muted-foreground mb-6">This will clear all participants and selections and return all cards to the deck.</p>
             <div className="flex gap-3">
-              <button
-                onClick={() => setShowRestartConfirm(false)}
-                className="flex-1 py-2.5 rounded-lg border border-border text-sm text-muted-foreground hover:text-foreground transition-colors"
-              >
+              <button onClick={() => setShowRestartConfirm(false)}
+                className="flex-1 py-2.5 rounded-lg border border-border text-sm text-muted-foreground hover:text-foreground transition-colors">
                 Cancel
               </button>
-              <button
-                onClick={() => { setShowRestartConfirm(false); handleRestart(); }}
-                className="flex-1 py-2.5 rounded-lg bg-destructive text-destructive-foreground text-sm font-semibold hover:bg-destructive/90 transition-colors"
-              >
+              <button onClick={() => { setShowRestartConfirm(false); handleRestart(); }}
+                className="flex-1 py-2.5 rounded-lg bg-destructive text-destructive-foreground text-sm font-semibold hover:bg-destructive/90 transition-colors">
                 Yes, Restart
               </button>
             </div>
