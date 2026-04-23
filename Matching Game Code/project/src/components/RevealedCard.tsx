@@ -126,14 +126,14 @@ export function RevealedCard({ agent, isSelected, onSelect, onSkip, onDismiss, s
                   boxShadow: "0 4px 15px hsl(300, 60%, 60%, 0.3)",
                 }}
               >
-                Select this Agent
+                It's a Match!
               </button>
               <button
                 onClick={onSkip}
                 className="flex-1 py-2.5 rounded-lg text-sm font-semibold border border-border text-muted-foreground hover:text-foreground hover:border-primary/50 transition-all"
                 style={{ background: "hsl(222, 40%, 12%)" }}
               >
-                Skip
+                It's Not a Match
               </button>
             </div>
           )
