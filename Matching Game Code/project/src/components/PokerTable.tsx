@@ -145,7 +145,7 @@ export function PokerTable({ participant, onRestart }: PokerTableProps) {
     <div
       className="min-h-screen flex flex-col items-center justify-center p-4 overflow-hidden relative"
       style={{
-        backgroundImage: `url('${import.meta.env.BASE_URL}images/casino-bg.png')`,
+        backgroundImage: `url('${import.meta.env.BASE_URL}images/dating-game-background.png')`,
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
@@ -156,7 +156,7 @@ export function PokerTable({ participant, onRestart }: PokerTableProps) {
       {/* Header */}
       <div className="text-center mb-4 z-30">
         <img
-          src={`${import.meta.env.BASE_URL}images/casino-sign.png`}
+          src={`${import.meta.env.BASE_URL}images/dgSign.png`}
           alt="Dynamics Agents"
           className="mx-auto h-36 md:h-48 w-auto drop-shadow-2xl animate-sign-glow"
         />
