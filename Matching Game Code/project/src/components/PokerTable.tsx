@@ -13,6 +13,7 @@ interface Participant {
   name: string;
   company: string;
   role: "dealer" | "player";
+  created_at: string;
 }
 
 interface PokerTableProps {
@@ -43,7 +44,9 @@ export function PokerTable({ participant, onRestart }: PokerTableProps) {
   const currentAgent = currentCardIndex >= 0 && currentCardIndex < agents.length ? agents[currentCardIndex] : null;
 
   const dealer = participants.find(p => p.role === "dealer");
-  const players = participants.filter(p => p.role === "player");
+  const players = participants
+    .filter(p => p.role === "player")
+    .sort((a, b) => a.created_at.localeCompare(b.created_at));
   const allParticipantsSorted = dealer ? [dealer, ...players] : players;
 
   const fetchAll = async () => {
@@ -178,10 +181,12 @@ export function PokerTable({ participant, onRestart }: PokerTableProps) {
               📊 Export
             </button>
           )}
-          <button onClick={() => setShowRestartConfirm(true)}
-            className="text-xs px-3 py-1 rounded-full bg-destructive text-destructive-foreground font-medium hover:bg-destructive/90 transition-colors">
-            🔄 Restart
-          </button>
+          {isDealer && (
+            <button onClick={() => setShowRestartConfirm(true)}
+              className="text-xs px-3 py-1 rounded-full bg-destructive text-destructive-foreground font-medium hover:bg-destructive/90 transition-colors">
+              🔄 Restart
+            </button>
+          )}
         </div>
       </div>
 
