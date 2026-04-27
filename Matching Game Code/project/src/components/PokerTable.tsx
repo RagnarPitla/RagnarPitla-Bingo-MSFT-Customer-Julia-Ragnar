@@ -58,7 +58,9 @@ export function PokerTable({ participant, onRestart }: PokerTableProps) {
 
       const newIndex = gs.current_card_index;
       const prevIndex = lastCardIndexRef.current;
-      if (prevIndex !== -2 && newIndex !== prevIndex && newIndex >= 0) setShowCard(true);
+      // Show card on initial join if game is already in progress,
+      // or whenever the dealer advances to a new card
+      if (newIndex >= 0 && (prevIndex === -2 || newIndex !== prevIndex)) setShowCard(true);
       lastCardIndexRef.current = newIndex;
       setCurrentCardIndex(newIndex);
 
