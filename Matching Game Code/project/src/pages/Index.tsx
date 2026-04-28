@@ -18,15 +18,15 @@ const Index = () => {
   const [dealerExists, setDealerExists] = useState(false);
   const [signInError, setSignInError] = useState<string | null>(null);
 
-  // On mount: restore participant instantly from localStorage — no API call needed
+  // On mount: restore participant instantly from sessionStorage — no API call needed
   useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
+    const saved = sessionStorage.getItem(STORAGE_KEY);
     if (saved) {
       try {
         const p: Participant = JSON.parse(saved);
         setParticipant(p);
       } catch {
-        localStorage.removeItem(STORAGE_KEY);
+        sessionStorage.removeItem(STORAGE_KEY);
       }
     }
   }, []);
@@ -55,12 +55,12 @@ const Index = () => {
   }, []);
 
   const saveParticipant = (p: Participant) => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(p));
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(p));
     setParticipant(p);
   };
 
   const clearParticipant = () => {
-    localStorage.removeItem(STORAGE_KEY);
+    sessionStorage.removeItem(STORAGE_KEY);
     setParticipant(null);
   };
 

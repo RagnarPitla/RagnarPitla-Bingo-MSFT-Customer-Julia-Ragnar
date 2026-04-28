@@ -63,7 +63,7 @@ export function PokerTable({ participant, onRestart }: PokerTableProps) {
       if (lastCardIndexRef.current !== -2 && parts.length > 0) {
         const stillInGame = parts.some(p => p.id === participant.id);
         if (!stillInGame) {
-          localStorage.removeItem("matching-game-participant");
+          sessionStorage.removeItem("matching-game-participant");
           onRestart?.();
           return;
         }
