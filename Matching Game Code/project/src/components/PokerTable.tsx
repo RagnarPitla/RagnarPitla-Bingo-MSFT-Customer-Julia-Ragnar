@@ -181,10 +181,15 @@ export function PokerTable({ participant, onRestart }: PokerTableProps) {
               📊 Export
             </button>
           )}
-          {isDealer && (
+          {isDealer ? (
             <button onClick={() => setShowRestartConfirm(true)}
               className="text-xs px-3 py-1 rounded-full bg-destructive text-destructive-foreground font-medium hover:bg-destructive/90 transition-colors">
               🔄 Restart
+            </button>
+          ) : (
+            <button onClick={() => setShowRestartConfirm(true)}
+              className="text-xs px-3 py-1 rounded-full border border-white/20 text-white/40 hover:text-white/70 hover:border-white/40 transition-colors">
+              Restart
             </button>
           )}
         </div>
