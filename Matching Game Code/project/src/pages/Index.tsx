@@ -10,12 +10,46 @@ interface Participant {
   role: "dealer" | "player";
 }
 
+const STORAGE_KEY = "matching-game-participant";
+
 const Index = () => {
   const [participant, setParticipant] = useState<Participant | null>(null);
   const [loading, setLoading] = useState(false);
+  const [restoring, setRestoring] = useState(true); // true while checking localStorage
   const [dealerExists, setDealerExists] = useState(false);
   const [signInError, setSignInError] = useState<string | null>(null);
 
+  // On mount: restore participant from localStorage and verify they still exist in the API
+  useEffect(() => {
+    const restore = async () => {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        try {
+          const p: Participant = JSON.parse(saved);
+          const parts = await gameApi.participants.list();
+          const found = parts.find(part => part.id === p.id);
+          if (found) {
+            setParticipant({ id: found.id, name: found.name, company: found.company, role: found.role as "dealer" | "player" });
+          } else {
+            // Participant no longer in DB (game was restarted) — clear cache
+            localStorage.removeItem(STORAGE_KEY);
+          }
+        } catch {
+          // API unavailable — restore from cache anyway so screen doesn't reset
+          try {
+            const p: Participant = JSON.parse(saved);
+            setParticipant(p);
+          } catch {
+            localStorage.removeItem(STORAGE_KEY);
+          }
+        }
+      }
+      setRestoring(false);
+    };
+    restore();
+  }, []);
+
+  // Dealer availability check
   useEffect(() => {
     const checkDealer = async () => {
       try {
@@ -30,7 +64,7 @@ const Index = () => {
         const gameIsActive = gs.current_card_index >= 0;
         setDealerExists(dealerIsRecent || gameIsActive);
       } catch {
-        // Silently ignore — API might not be ready yet
+        // Silently ignore
       }
     };
     checkDealer();
@@ -38,9 +72,19 @@ const Index = () => {
     return () => clearInterval(poll);
   }, []);
 
+  const saveParticipant = (p: Participant) => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(p));
+    setParticipant(p);
+  };
+
+  const clearParticipant = () => {
+    localStorage.removeItem(STORAGE_KEY);
+    setParticipant(null);
+  };
+
   const handleRestart = async () => {
     await gameApi.resetGame();
-    setParticipant(null);
+    clearParticipant();
     setDealerExists(false);
   };
 
@@ -55,13 +99,16 @@ const Index = () => {
         gameApi.participants.create({ name, company, role }),
         timeout,
       ]);
-      setParticipant({ id: p.id, name: p.name, company: p.company, role: p.role });
+      saveParticipant({ id: p.id, name: p.name, company: p.company, role: p.role });
     } catch (err: any) {
       setSignInError(err.message ?? "Connection error — please try again.");
     } finally {
       setLoading(false);
     }
   };
+
+  // Show nothing while restoring session to avoid flash of sign-in screen
+  if (restoring) return null;
 
   if (!participant) {
     return (
@@ -80,7 +127,7 @@ const Index = () => {
   return (
     <PokerTable
       participant={participant}
-      onRestart={() => { setParticipant(null); setDealerExists(false); }}
+      onRestart={() => { clearParticipant(); setDealerExists(false); }}
     />
   );
 };
