@@ -64,9 +64,9 @@ export function RevealedCard({ agent, isSelected, onSelect, onSkip, onDismiss, s
           ))}
         </div>
 
-        {/* Scenarios */}
+        {/* Business Outcomes */}
         <div className="mb-4">
-          <h4 className="text-xs font-semibold uppercase tracking-wider text-primary mb-2">Scenarios</h4>
+          <h4 className="text-xs font-semibold uppercase tracking-wider text-primary mb-2">Business Outcomes</h4>
           <ul className="space-y-1.5">
             {agent.scenarios.map((s, i) => (
               <li key={i} className="text-xs text-muted-foreground flex items-start gap-2">
