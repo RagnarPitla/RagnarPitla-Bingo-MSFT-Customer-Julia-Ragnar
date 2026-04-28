@@ -59,6 +59,16 @@ export function PokerTable({ participant, onRestart }: PokerTableProps) {
 
       setParticipants(parts.map(p => ({ ...p, role: p.role as "dealer" | "player" })));
 
+      // If game was restarted and this participant no longer exists, clear session
+      if (lastCardIndexRef.current !== -2 && parts.length > 0) {
+        const stillInGame = parts.some(p => p.id === participant.id);
+        if (!stillInGame) {
+          localStorage.removeItem("matching-game-participant");
+          onRestart?.();
+          return;
+        }
+      }
+
       const newIndex = gs.current_card_index;
       const prevIndex = lastCardIndexRef.current;
       // Show card on initial join if game is already in progress,

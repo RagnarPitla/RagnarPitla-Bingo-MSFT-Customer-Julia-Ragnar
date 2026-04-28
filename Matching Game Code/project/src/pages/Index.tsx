@@ -15,38 +15,20 @@ const STORAGE_KEY = "matching-game-participant";
 const Index = () => {
   const [participant, setParticipant] = useState<Participant | null>(null);
   const [loading, setLoading] = useState(false);
-  const [restoring, setRestoring] = useState(true); // true while checking localStorage
   const [dealerExists, setDealerExists] = useState(false);
   const [signInError, setSignInError] = useState<string | null>(null);
 
-  // On mount: restore participant from localStorage and verify they still exist in the API
+  // On mount: restore participant instantly from localStorage — no API call needed
   useEffect(() => {
-    const restore = async () => {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        try {
-          const p: Participant = JSON.parse(saved);
-          const parts = await gameApi.participants.list();
-          const found = parts.find(part => part.id === p.id);
-          if (found) {
-            setParticipant({ id: found.id, name: found.name, company: found.company, role: found.role as "dealer" | "player" });
-          } else {
-            // Participant no longer in DB (game was restarted) — clear cache
-            localStorage.removeItem(STORAGE_KEY);
-          }
-        } catch {
-          // API unavailable — restore from cache anyway so screen doesn't reset
-          try {
-            const p: Participant = JSON.parse(saved);
-            setParticipant(p);
-          } catch {
-            localStorage.removeItem(STORAGE_KEY);
-          }
-        }
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      try {
+        const p: Participant = JSON.parse(saved);
+        setParticipant(p);
+      } catch {
+        localStorage.removeItem(STORAGE_KEY);
       }
-      setRestoring(false);
-    };
-    restore();
+    }
   }, []);
 
   // Dealer availability check
@@ -106,9 +88,6 @@ const Index = () => {
       setLoading(false);
     }
   };
-
-  // Show nothing while restoring session to avoid flash of sign-in screen
-  if (restoring) return null;
 
   if (!participant) {
     return (
