@@ -13,71 +13,26 @@ export interface Agent {
 export const agents: Agent[] = [
   {
     key: "bank-account-balance",
-    title: "Bank Account Balance Agent",
+    title: "Account Reconciliation Agent",
     businessValue:
-      "Retrieves bank account balances from Dynamics 365 Finance for a selected company and date and delivers them in a structured report for reconciliation.",
+      "Helps customers maintain a continuously reconciled state by proactively identifying exceptions, suggesting mitigations, and logging every action for full transparency and financial accuracy.",
     keyBenefits: [
-      "Eliminates manual Trial Balance exports",
-      "Provides structured, reconciliation-ready data",
-      "Simplifies access to cash and bank balances",
-      "Streamlines daily treasury workflows",
+      "Enhanced Efficiency: Customers can maintain a reconciled state more consistently, reducing the time and effort required for manual reconciliation.",
+      "Proactive Management: The intelligent agent proactively identifies and suggests mitigations for exceptions, minimizing the risk of errors and ensuring financial accuracy.",
+      "Improved Transparency: Every exception is meticulously logged, capturing the history of actions taken by users, automation, or agents, thereby enhancing transparency and accountability.",
+      "Regular Reconciliation: The ability to reconcile on a more regular basis ensures that customers' financial records are always up-to-date, leading to better decision-making and financial planning.",
     ],
     description:
-      "Retrieves bank account balances from Dynamics 365 Finance for a selected company and date and delivers them in a structured report for reconciliation.",
+      "Helps customers maintain a continuously reconciled state by proactively identifying exceptions, suggesting mitigations, and logging every action for full transparency and financial accuracy.",
     scenarios: [
-      "Faster cash application with instant balance access",
-      "Improved reconciliation accuracy via structured data",
-      "Reduced manual effort in finance workflows",
+      "Continuous reconciliation",
+      "Identify issues in real time",
+      "Close books faster",
+      "Focus on planning",
     ],
     technologies: ["Dynamics 365 Finance", "Copilot Studio"],
     industries: "Finance",
     licences: "Dynamics 365 Finance, Copilot Studio",
-  },
-  {
-    key: "period-close-execution",
-    title: "Period Close Execution Agent",
-    businessValue:
-      "Automates and orchestrates financial period close tasks in Dynamics 365 by retrieving task lists and executing approved activities.",
-    keyBenefits: [
-      "Real-time visibility into close tasks and status",
-      "Controlled automation using #Agent tagging",
-      "Reduced manual coordination across teams",
-      "Conversational tracking of close progress",
-    ],
-    description:
-      "Automates and orchestrates financial period close tasks in Dynamics 365 by retrieving task lists and executing approved activities.",
-    scenarios: [
-      "Faster financial close cycles",
-      "Controlled and auditable automation execution",
-      "Fewer bottlenecks through proactive task identification",
-      "Full audit trail captured in Dynamics 365",
-    ],
-    technologies: ["Dynamics 365 Finance", "Copilot Studio", "Power Automate"],
-    industries: "Finance",
-    licences: "Dynamics 365 Finance, Copilot Studio, Power Automate",
-  },
-  {
-    key: "cash-collection",
-    title: "Cash Collection Agent",
-    businessValue:
-      "Manages the full dunning and collections process by automating customer outreach, escalation, and tracking within Dynamics 365.",
-    keyBenefits: [
-      "Automated end-to-end collections lifecycle",
-      "Intelligent, stage-based customer communications",
-      "Integrated scheduling and call preparation",
-      "Full activity tracking and audit trail",
-    ],
-    description:
-      "Manages the full dunning and collections process by automating customer outreach, escalation, and tracking within Dynamics 365.",
-    scenarios: [
-      "Reduced bad debt through early intervention",
-      "Faster cash inflow by reducing payment delays",
-      "More consistent and structured escalation process",
-      "Audit-ready record of all collection activities",
-    ],
-    technologies: ["Dynamics 365 Finance", "Copilot Studio", "Power Automate"],
-    industries: "Finance",
-    licences: "Dynamics 365 Finance, Copilot Studio, Power Automate",
   },
   {
     key: "vendor-risk-analysis",
@@ -123,5 +78,51 @@ export const agents: Agent[] = [
     technologies: ["Dynamics 365 Finance", "Dynamics 365 Supply Chain", "Copilot Studio"],
     industries: "Finance, Supply Chain",
     licences: "Dynamics 365 Finance, Dynamics 365 Supply Chain, Copilot Studio",
+  },
+  {
+    key: "cash-collection",
+    title: "Cash Collection Agent",
+    businessValue:
+      "Manages the full dunning and collections process by automating customer outreach, escalation, and tracking within Dynamics 365.",
+    keyBenefits: [
+      "Automated end-to-end collections lifecycle",
+      "Intelligent, stage-based customer communications",
+      "Integrated scheduling and call preparation",
+      "Full activity tracking and audit trail",
+    ],
+    description:
+      "Manages the full dunning and collections process by automating customer outreach, escalation, and tracking within Dynamics 365.",
+    scenarios: [
+      "Reduced bad debt through early intervention",
+      "Faster cash inflow by reducing payment delays",
+      "More consistent and structured escalation process",
+      "Audit-ready record of all collection activities",
+    ],
+    technologies: ["Dynamics 365 Finance", "Copilot Studio", "Power Automate"],
+    industries: "Finance",
+    licences: "Dynamics 365 Finance, Copilot Studio, Power Automate",
+  },
+  {
+    key: "period-close-execution",
+    title: "Period Close Agent",
+    businessValue:
+      "Automates and orchestrates financial period close tasks in Dynamics 365 by retrieving task lists and executing approved activities.",
+    keyBenefits: [
+      "Real-time visibility into close tasks and status",
+      "Controlled automation using #Agent tagging",
+      "Reduced manual coordination across teams",
+      "Conversational tracking of close progress",
+    ],
+    description:
+      "Automates and orchestrates financial period close tasks in Dynamics 365 by retrieving task lists and executing approved activities.",
+    scenarios: [
+      "Faster financial close cycles",
+      "Controlled and auditable automation execution",
+      "Fewer bottlenecks through proactive task identification",
+      "Full audit trail captured in Dynamics 365",
+    ],
+    technologies: ["Dynamics 365 Finance", "Copilot Studio", "Power Automate"],
+    industries: "Finance",
+    licences: "Dynamics 365 Finance, Copilot Studio, Power Automate",
   },
 ];
